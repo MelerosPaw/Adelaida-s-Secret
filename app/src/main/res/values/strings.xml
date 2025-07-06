@@ -1,0 +1,45 @@
+<resources>
+  <string name="app_name">ComposeTest</string>
+
+  <!-- region Nuevo tablero -->
+  <string name="titulo_nuevo_tablero">Tablero nuevo</string>
+  <string name="boton_finalizar_nuevo_tablero">Listo</string>
+  <!-- endregion -->
+
+  <!-- region Selección jugadores -->
+  <string name="boton_iniciar_partida">Iniciar partida</string>
+  <string name="explicacion_tablero"><![CDATA[<p>Genera un tablero pulsando <i>%1$s</i> y móntalo antes de seguir. Si no te convence, puedes volver a pulsar <i>%2$s</i> para generar uno nuevo.</p>Una vez vayas a empezar el juego, pulsa <i>%3$s</i>. A partir de ese momento, ya no podrás cambiarlo.]]></string>
+  <string name="explicacion_asesino"><![CDATA[El asesino es <strong>%1$s</strong>, por lo que aparta del juego las siguientes pistas: %2$s.]]></string>
+  <string name="explicacion_asesina"><![CDATA[La asesina es <strong>%1$s</strong>, por lo que aparta del juego las siguientes pistas: %2$s.]]></string>
+  <!-- endregion -->
+
+  <!-- region Partida -->
+  <string name="alias_ronda_mediodia">Ronda de investigación</string>
+  <string name="alias_ronda_tarde">Ronda de asuntos turbios</string>
+  <string name="explicacion_manana">Reune a los investigadores para desayunar. Si hay un evento (cosa que tendrá que salir en algún lado), haz el evento. Aumenta el contador de Fuerza de la defensa y luego pide a cada jugador que seleccione la habitación en la que van a investigar.</string>
+  <string name="explicacion_mediodia">Cada investigador se moverá a la casilla de la habitación seleccionada que quieran investigar. Asígnale el contenido de dicha casilla si todavía no se lo ha llevado nadie. Una vez todos los jugadores se hayan movido, asegúrate de que todos tienen como máximo 3 pistas en sus vitrinas y después mándalos a sus cuartos para que las lean tranquilamente. Aquellos que estén en la misma habitación deben irse juntos al mismo cuarto.</string>
+  <string name="explicacion_tarde"><![CDATA[<p>Si hay un evento, realízalo antes de empezar. A continuación, visita por turnos a los jugadores que tengan el dinero suficiente para contratar sicarios, o un brandy para emborrachar a otro investigador. Solo pueden realizar un asunto turbio sobre cada jugador.</p>Cuando todos hayan realizado los asuntos turbios que quiran y terminen de estudiar sus pistas, pasa a la siguiente ronda.]]></string>
+  <string name="explicacion_primera_noche">Llama a los jugadores a la mesa para cenar. El primro día, entrega a cada uno un baremo de fuerza de la acusación. Si es otro día, ofrece la posibilidad de cambiar su baremo, dándole tres a elegir aleatoriamente. Luego destapa un evento. Si tiene lugar esta noche, realízalo ahora. Por último, envía a todo el mundo a la cama. Si alguno de los investigadores acaba de obtener una pista nueva, Adelaida debe hacerle una visita.</string>
+  <string name="explicacion_resto_de_noches">Explicación resto de noches</string>
+  <string name="no_valido">Esto jamás debería verse</string>
+  <string name="pregunta_fin_manana">¿Quieres dar por finalizada la mañana?</string>
+  <string name="pregunta_fin_mediodia">¿Quieres dar por finalizado el mediodía?</string>
+  <string name="pregunta_fin_tarde">¿Quieres dar por finalizada la tarde?</string>
+  <string name="pregunta_fin_noche">¿Quieres dar por finalizada la noche?</string>
+  <!-- endregion -->
+
+  <!-- region Tab Jugadores -->
+  <string name="corregir">Corregir</string>
+  <string name="advertencia_reasignacion_carta_mediodia">No deberías reasignar una carta si no es porque se la hayas asignado al jugador equivocado. ¿Estás seguro de que quieres continuar?</string>
+  <string name="advertencia_reasignacion_carta_tarde">No deberías asignar cartas del tablero por la tarde. ¿Estás seguro de que quieres continuar?</string>
+  <string name="advertencia_reasignacion_pista_mediodia">No deberías reasignar una pista si no es porque se la hayas asignado al jugador equivocado. ¿Estás seguro de que quieres continuar?</string>
+  <string name="advertencia_reasignacion_pista_tarde">No deberías asignar pistas del tablero por la tarde. ¿Estás seguro de que quieres continuar?</string>
+  <string name="advertencia_asuntos_turbios">No se pueden llevar a cabo asuntos turbios hasta que no llegue la tarde. ¿Quieres llevarlo a acabo de todas formas?</string>
+  <string name="advertencia_cambio_tab_tablero">No deberías hacer absolutamente nada en el tablero durante la tarde. ¿Quieres acceder al tablero de todas maneras?</string>
+  <!-- endregion -->
+
+  <!-- region Seccion eventos -->
+  <string name= "sin_evento_seleccionado">Sin evento aún</string>
+
+
+</resources>
