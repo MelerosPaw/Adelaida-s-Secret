@@ -14,7 +14,7 @@ import com.example.composetest.ui.viewmodel.MediodiaTardeViewModel.EstadoTablero
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-typealias PartidaModelo = com.example.composetest.model.Partida
+typealias PartidaModelo = Partida
 
 class EstadoPartida {
 
@@ -54,6 +54,7 @@ class EstadoPartida {
     set(Estado.Partida(partida))
     set(Estado.TabActual(TabData.obtenerPorRonda(partida.ronda)))
     set(Estado.Tablero(partida.tablero?.let { EstadoTablero(it, obtenerElementosFueraDelTablero(partida)) }))
+    set(Estado.EstadoInfoTab(partida))
   }
 
   private fun obtenerElementosFueraDelTablero(partida: Partida): List<ElementoTablero> =

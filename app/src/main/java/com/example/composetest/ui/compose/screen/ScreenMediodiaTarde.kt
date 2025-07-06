@@ -6,26 +6,21 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import com.example.composetest.model.Jugador
 import com.example.composetest.model.Partida
 import com.example.composetest.ui.compose.AccionProhibida
+import com.example.composetest.ui.compose.BarraNavegacionPartida
 import com.example.composetest.ui.compose.DialogoAccionProhibida
 import com.example.composetest.ui.compose.EstadoAccionProhibida
 import com.example.composetest.ui.compose.NightAndDay
@@ -39,10 +34,8 @@ import com.example.composetest.ui.compose.sampledata.jugadores
 import com.example.composetest.ui.compose.sampledata.partidas
 import com.example.composetest.ui.compose.theme.AdelaidaTheme
 import com.example.composetest.ui.compose.theme.AdelaidaThemeVerde
-import com.example.composetest.ui.compose.theme.Tema
 import com.example.composetest.ui.compose.widget.AdelaidaTab
 import com.example.composetest.ui.compose.widget.AdelaidaTabRow
-import com.example.composetest.ui.compose.widget.AdelaidaText
 import com.example.composetest.ui.contracts.ConsumidorTabInfo
 import com.example.composetest.ui.contracts.EstadoMediodiaTarde
 import com.example.composetest.ui.manager.AsuntoTurbio
@@ -178,31 +171,6 @@ private fun Tabs(
         AdelaidaTab(it.data.posicion, it.data.posicion == paginaActual, it.data.nombre, { posicion -> it.alClicar(
           TabData.obtenerPorPosicion(posicion)) })
       }
-    }
-  }
-}
-
-@Composable
-private fun BarraNavegacionPartida(tabSeleccionada: TabData, tabs: Array<TabWrapper>) {
-  NavigationBar(
-    containerColor = Tema.colors.toolbarContainer,
-    // Esto es necesario porque aquí no hay que aplicar insets. El componente está pensado para ser
-    // utilizado en la pantalla base de la aplicación, pero allí ya se le están aplicando los insets
-    // al contenedor del grafo, por lo que no hay que aplicarlos aquí nuevamente.
-    windowInsets = WindowInsets(0, 0, 0, 0)
-  ) {
-    tabs.forEach { tab ->
-      val isSelected = tabSeleccionada == tab.data
-
-      NavigationBarItem(
-        selected = isSelected,
-        onClick = { tab.alClicar(tab.data) },
-        icon = { tab.icono(isSelected) },
-        label = { AdelaidaText(tab.data.nombre, fontSize = 14.sp, color = Color.White) },
-        colors = NavigationBarItemDefaults.colors(
-          indicatorColor = Tema.colors.indicadorSeleccionBarraNavegacion,
-        )
-      )
     }
   }
 }

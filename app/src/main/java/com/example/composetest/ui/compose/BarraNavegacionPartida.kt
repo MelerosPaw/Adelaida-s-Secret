@@ -51,10 +51,9 @@ fun BarraNavegacionPartida(tabSeleccionada: TabData?, tabs: Array<TabWrapper>) {
 }
 
 @Composable
-fun getColorIconoNavegacion(seleccionado: Boolean) : Color =
-  Tema.colors.iconoBarraNavegacionSelecionado
-    .takeIf { seleccionado }
-    ?: Tema.colors.iconoBarraNavegacion
+fun getColorIconoNavegacion(seleccionado: Boolean) : Color = with(Tema.colors) {
+  iconoBarraNavegacionSelecionado.takeIf { seleccionado } ?: iconoBarraNavegacion
+}
 
 @Composable
 private fun IconoTab(tabData: TabData, seleccionado: Boolean) {
@@ -62,18 +61,8 @@ private fun IconoTab(tabData: TabData, seleccionado: Boolean) {
   val tint = getColorIconoNavegacion(seleccionado)
 
   when (tabData.toDraw) {
-    is ToDraw.Id -> AdelaidaIcon(
-      painterResource(tabData.toDraw.id),
-      null,
-      modifier,
-      tint = tint
-    )
-    is ToDraw.Vector -> AdelaidaIcon(
-      imageVector = tabData.toDraw.imageVector,
-      null,
-      modifier,
-      tint = tint
-    )
+    is ToDraw.Id -> AdelaidaIcon(painterResource(tabData.toDraw.id), null, modifier, tint)
+    is ToDraw.Vector -> AdelaidaIcon(imageVector = tabData.toDraw.imageVector, null, modifier, tint)
   }
 }
 
