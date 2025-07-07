@@ -28,7 +28,7 @@ sealed class PosibleAccionProhibida() {
     class Compra() : PosibleAccionProhibida()
     class Robo() : PosibleAccionProhibida()
     data class Reasignacion(val elemento: ElementoTablero, val tabActual: TabData) : PosibleAccionProhibida()
-    class CambioTab(val pagina: TabData) : PosibleAccionProhibida()
+    class CambioTab(val tab: TabData) : PosibleAccionProhibida()
 }
 
 

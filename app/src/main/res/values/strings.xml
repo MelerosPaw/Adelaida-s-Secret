@@ -35,6 +35,8 @@
   <string name="advertencia_reasignacion_pista_mediodia">No deberías reasignar una pista si no es porque se la hayas asignado al jugador equivocado. ¿Estás seguro de que quieres continuar?</string>
   <string name="advertencia_reasignacion_pista_tarde">No deberías asignar pistas del tablero por la tarde. ¿Estás seguro de que quieres continuar?</string>
   <string name="advertencia_asuntos_turbios">No se pueden llevar a cabo asuntos turbios hasta que no llegue la tarde. ¿Quieres llevarlo a acabo de todas formas?</string>
+  <string name="advertencia_eventos">No deberías necesitar entrar en los eventos y baremos hasta que no llegue la noche. ¿Quieres ir de todas formas?</string>
+  <string name="advertencia_tablero">No deberías ¿Quieres llevarlo a acabo de todas formas?</string>
   <string name="advertencia_cambio_tab_tablero">No deberías hacer absolutamente nada en el tablero durante la tarde. ¿Quieres acceder al tablero de todas maneras?</string>
   <!-- endregion -->
 

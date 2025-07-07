@@ -24,6 +24,7 @@ import com.example.composetest.ui.contracts.ConsumidorPartida
 import com.example.composetest.ui.contracts.EstadoPartida
 import com.example.composetest.ui.contracts.IntencionPartida
 import com.example.composetest.ui.manager.AsuntoTurbio
+import com.example.composetest.ui.manager.GestorRonda
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import javax.inject.Provider
@@ -65,6 +66,7 @@ class PartidaViewModel @Inject constructor(
 
     var onAbandonar: (() -> Unit)? = null
     var navegadorRondas: NavegadorRondas? = null
+    var gestorRonda: GestorRonda? = null
     val consumidor: ConsumidorPartida = object: ConsumidorPartida {
         override fun consumir(vararg intenciones: IntencionPartida) {
             intenciones.forEach {
@@ -200,7 +202,12 @@ class PartidaViewModel @Inject constructor(
                             partida
                                 ?.takeIf { it.ronda != infoRonda.value?.ronda }
                                 ?.let {
-                                    estado.setPartida(partida)
+                                    if (gestorRonda == null || gestorRonda?.esOtraRonda(it.ronda) == true) {
+                                        gestorRonda = GestorRonda.Factory.from(it.ronda) { mensaje ->
+                                            consumidor.consumir(IntencionPartida.MostrarMensaje(mensaje))
+                                        }
+                                    }
+                                    estado.setPartida(it)
                                     initInfoRonda(it)
                                 }
                         }
@@ -272,9 +279,9 @@ class PartidaViewModel @Inject constructor(
                 ?.copy(tabActual = estado.tabActual.value.tab!!)
                 ?: accionProhida.posibleAccionProhibida
 
-            val advertencia: String? = "Es posible que esta acción esté prohibida"/*gestorRonda
+            val advertencia: String? = gestorRonda
                 ?.advertenciaAccionProhibida(posibleAccionProhibida)
-                ?.let(context::getString)*/
+                ?.let(context::getString)
 
             ejecutarAccionProhibida(advertencia, accionProhida)
         }

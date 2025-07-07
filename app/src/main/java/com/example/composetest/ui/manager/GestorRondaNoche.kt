@@ -1,6 +1,7 @@
 package com.example.composetest.ui.manager
 
 import androidx.annotation.StringRes
+import com.example.composetest.R
 import com.example.composetest.extensions.joinToStringHumanReadable
 import com.example.composetest.model.Evento
 import com.example.composetest.model.Jugador
@@ -19,7 +20,12 @@ class GestorRondaNoche(
     override fun seEjecutaAhora(evento: Evento): Boolean = evento.ronda == Partida.Ronda.NOCHE
 
     @StringRes
-    override fun advertenciaAccionProhibida(posibleAccionProhibida: PosibleAccionProhibida): Int? = null
+    override fun advertenciaAccionProhibida(posibleAccionProhibida: PosibleAccionProhibida): Int? =
+        when (posibleAccionProhibida) {
+            is PosibleAccionProhibida.Compra, is PosibleAccionProhibida.Robo -> R.string.advertencia_asuntos_turbios
+            is PosibleAccionProhibida.Reasignacion -> asignacionProhibida(posibleAccionProhibida.elemento)
+            is PosibleAccionProhibida.CambioTab -> null
+        }
 
     override fun sePuedeCambiarDeRonda(partida: Partida): Boolean {
         val sePuede = super.sePuedeCambiarDeRonda(partida)
@@ -33,6 +39,8 @@ class GestorRondaNoche(
             false
         }
     }
+
+    override fun esOtraRonda(ronda: Partida.Ronda): Boolean = ronda != Partida.Ronda.NOCHE
 
     // TODO Melero: 5/3/25
     private fun hayVisitasPendientes(): Validacion = Validacion(false, "Quedan las visitas")

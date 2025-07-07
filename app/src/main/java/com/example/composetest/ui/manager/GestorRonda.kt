@@ -48,9 +48,11 @@ interface GestorRonda {
             ?.let { mostrarMensaje(Mensaje("No se puede cambiar de ronda aún:\n\n$it")) }
     }
 
+    fun esOtraRonda(ronda: Partida.Ronda): Boolean
+
     private fun comprobarLimitePistas(partida: Partida): Validacion {
         val jugadoresConDemasiadasPistas = partida.jugadores.filter { it.tieneDemasiadasPistas() }
-        val vale = jugadoresConDemasiadasPistas.isEmpty() == true
+        val vale = jugadoresConDemasiadasPistas.isEmpty()
         val mensaje = jugadoresConDemasiadasPistas.takeIf { !vale }?.let { mostrarJugadoresConDemasiadasPistas(it) }
         return Validacion(vale, mensaje)
     }

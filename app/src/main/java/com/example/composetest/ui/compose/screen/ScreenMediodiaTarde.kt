@@ -189,7 +189,7 @@ private fun ScreenPartidaPreview() {
     val asuntoTurbio = AsuntoTurbio.Robo(
       TabJugadoresViewModel.MostrarElementos.Vitrina(jugadores()[0])
     )
-    val gestorRonda = GestorRondaMediodia({})
+    val gestorRonda = GestorRondaMediodia { }
     val accionProhibida = AccionProhibida(PosibleAccionProhibida.Robo(), {}, {})
     val advertenciaRes =
       gestorRonda.advertenciaAccionProhibida(accionProhibida.posibleAccionProhibida)
