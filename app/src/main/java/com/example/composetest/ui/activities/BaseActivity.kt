@@ -1,7 +1,6 @@
 package com.example.composetest.ui.activities
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import androidx.activity.ComponentActivity
 import com.example.composetest.ui.viewmodel.BaseViewModel
 
@@ -18,11 +17,7 @@ abstract class BaseActivity: ComponentActivity() {
                     .setTitle("Mensaje")
                     .setMessage(it)
                     .setCancelable(false)
-                    .setPositiveButton("OK", object: DialogInterface.OnClickListener {
-                        override fun onClick(dialog: DialogInterface?, which: Int) {
-                            dialog?.dismiss()
-                        }
-                    })
+                    .setPositiveButton("OK") { dialog, _ -> dialog?.dismiss() }
                     .show()
             }
         }

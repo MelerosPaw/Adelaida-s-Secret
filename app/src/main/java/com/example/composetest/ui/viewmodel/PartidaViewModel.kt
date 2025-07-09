@@ -10,6 +10,7 @@ import com.example.composetest.R
 import com.example.composetest.data.uc.ActualizarNombrePartidaUC
 import com.example.composetest.data.uc.ActualizarRondaUC
 import com.example.composetest.data.uc.ObtenerPartidaFlowUC
+import com.example.composetest.extensions.noneNull
 import com.example.composetest.model.ElementoTablero
 import com.example.composetest.model.Jugador
 import com.example.composetest.model.Partida
@@ -87,16 +88,18 @@ class PartidaViewModel @Inject constructor(
     }
 
     fun onCambioRondaSolicitado(infoRondaActual: InfoRonda) {
-        _infoRonda.value = infoRondaActual.copy(solicitarCambioRonda = true)
+        comprobarSiSePuedeCambiarDeRonda(infoRondaActual)
     }
 
-    fun onCondicionesCambioRondaSatisfechas(satisfechas: Boolean) {
-        infoRonda.value?.let {
-            if (satisfechas) {
-                onMostrarDialogoCambioRonda(it)
-            } else {
-                _infoRonda.value = it.copy(solicitarCambioRonda = false)
-            }
+    private fun comprobarSiSePuedeCambiarDeRonda(infoRondaActual: InfoRonda) {
+        noneNull(partida.value, gestorRonda) { partida, gestor ->
+            onCondicionesCambioRondaSatisfechas(gestor.sePuedeCambiarDeRonda(partida), infoRondaActual)
+        }
+    }
+
+    fun onCondicionesCambioRondaSatisfechas(satisfechas: Boolean, infoRondaActual: InfoRonda) {
+        if (satisfechas) {
+            onMostrarDialogoCambioRonda(infoRondaActual)
         }
     }
 

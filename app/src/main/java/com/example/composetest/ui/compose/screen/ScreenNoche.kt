@@ -62,6 +62,16 @@ import com.example.composetest.ui.viewmodel.NocheViewModel.EventoRealizandose
 import com.example.composetest.ui.viewmodel.NocheViewModel.JugadorVO
 
 @Composable
+fun TabEventos(partida: Partida?, onMensaje: (Mensaje) -> Unit) {
+    ScreenNoche(
+        partida = partida,
+        cambioRondaSolicitado = false, // Esto no se pasa hasta aquí porque se gestiona en la ScreenPartida
+        onCondicionesCambioRondaSatisfechas = {}, // Idem
+        onMensaje = onMensaje
+    )
+}
+
+@Composable
 fun ScreenNoche(
     partida: Partida?,
     cambioRondaSolicitado: Boolean,

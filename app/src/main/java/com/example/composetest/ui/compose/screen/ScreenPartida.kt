@@ -111,7 +111,6 @@ fun ScreenPartida(
         viewModel.estado,
         viewModel.infoRonda,
         viewModel::onCambioRondaSolicitado,
-        viewModel::onCondicionesCambioRondaSatisfechas,
         viewModel::onMostrarDialogoCambioRonda,
         viewModel::onCambiarVisibilidadExplicacionRonda,
         viewModel::onCerrarTituloSiguienteRonda,
@@ -141,7 +140,6 @@ private fun ScreenPartida(
     estado: EstadoPartida,
     infoRonda: State<InfoRonda?>,
     onCambioRondaSolicitado: (InfoRonda) -> Unit,
-    onCondicionesCambioRondaSatisfechas: (Boolean) -> Unit,
     onMostrarDialogoCambioRonda: (InfoRonda) -> Unit,
     onCambiarVisibilidadInfoRonda: (InfoRonda) -> Unit,
     onOcultarTituloSiguienteRonda: (InfoRonda) -> Unit,
@@ -187,7 +185,7 @@ private fun ScreenPartida(
             titulo = NavegadorCreacion.ConfiguracionToolbar.nombrePartida(
                 partida.partida?.nombre.orEmpty(),
                 actualizarNombrePartida,
-                asuntoTurbio is Ninguno
+                asuntoTurbio.asuntoTurbio is Ninguno
             ),
             actions = {
                 Box {
@@ -197,7 +195,7 @@ private fun ScreenPartida(
                         abrirPapelera, cerrarPapelera, recuperarElemento
                     )
                 }
-                CancelarRobo(asuntoTurbio !is Ninguno, cancelarCompra)
+                CancelarRobo(asuntoTurbio.asuntoTurbio !is Ninguno, cancelarCompra)
                 RondaSiguiente(
                     info,
                     onCambioRondaSolicitado,
@@ -218,8 +216,8 @@ private fun ScreenPartida(
 //                    onNavegacionHabilitada, info?.solicitarCambioRonda == true,
 //                    onCondicionesCambioRondaSatisfechas
 //                )
-                Contenido(estado, consumidor, asuntoTurbio.asuntoTurbio, filtrosAbiertos, cerrarFiltros, {},
-                    onCondicionesCambioRondaSatisfechas
+                Contenido(estado, consumidor, asuntoTurbio.asuntoTurbio, filtrosAbiertos,
+                    cerrarFiltros, {}
                 )
                 BarraNavegacionPartida(
                     tabSeleccionada = tabActual.tab,
@@ -242,7 +240,6 @@ private fun ColumnScope.Contenido(
     filtrosAbiertos: State<Boolean>,
     cerrarFiltros: () -> Unit,
     onAccionProhibida: (AccionProhibida) -> Unit, // Mover muchas cosas
-    onCondicionesCambioRondaSatisfechas: (Boolean) -> Unit,
 ) {
     val partida by remember { estado.partida }
     val tabActual by remember { estado.tabActual }
@@ -262,9 +259,9 @@ private fun ColumnScope.Contenido(
                 { consumidor.consumir(IntencionPartida.IniciarAsuntoTurbio(it)) },
                 onAccionProhibida
             )
-            tabActual.tab == TabData.EVENTOS -> ScreenNoche(
-                partida.partida, false, onCondicionesCambioRondaSatisfechas,
-                { consumidor.consumir(IntencionPartida.MostrarMensaje(it)) })
+            tabActual.tab == TabData.EVENTOS -> TabEventos(partida.partida) {
+                consumidor.consumir(IntencionPartida.MostrarMensaje(it))
+            }
 
             tabActual.tab == TabData.INFO -> {
                 val tabInfo by remember { estado.estadoTabInfo }
@@ -561,7 +558,6 @@ private fun ScreenPartidaPreview() {
         ConsumidorPartida.Dummy(),
         estado,
         mutableStateOf(infoRonda),
-        {},
         {},
         {},
         {},
