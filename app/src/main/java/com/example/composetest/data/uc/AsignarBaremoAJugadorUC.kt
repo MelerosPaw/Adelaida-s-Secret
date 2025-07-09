@@ -16,9 +16,7 @@ class AsignarBaremoAJugadorUC @Inject constructor(
 
     override suspend fun execute(parametros: Parametros): Respuesta<Boolean> = with(parametros) {
         actualizarJugador(
-            ActualizarJugadorUC.Parametros(idPartida, jugador,
-                "asignarle el baremo $idBaremo"
-            ) {
+            ActualizarJugadorUC.Parametros(idPartida, jugador, "asignarle el baremo $idBaremo") {
                 it.copy(baremo = idBaremo)
             }
         )

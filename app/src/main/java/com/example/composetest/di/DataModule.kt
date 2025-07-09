@@ -48,8 +48,7 @@ abstract class DataModule {
 
             return sqlQuery.fold("") { acc, character ->
                 val siguiente = if (character == '?') {
-                    replacementIndex++
-                    bindArgs.getOrNull(replacementIndex).toString()
+                    bindArgs.getOrNull(replacementIndex++).toString()
                 } else {
                     character.toString()
                 }

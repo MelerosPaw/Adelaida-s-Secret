@@ -13,7 +13,7 @@ class CambiarNombreJugadorUC @Inject constructor(
 
     override suspend fun execute(parametros: Parametros): Boolean = with(parametros) {
         Logger.logSql("Cambiar nombre de jugador")
-        baseDatos.jugadorDao().cambiarNombre(jugador.nombre, idPartida, nombre)
+        baseDatos.jugadorDao().cambiarNombre(nombre, jugador.nombre, idPartida)
         true
     }
 }

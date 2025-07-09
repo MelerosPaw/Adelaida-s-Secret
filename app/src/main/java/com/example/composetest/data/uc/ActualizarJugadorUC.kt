@@ -31,7 +31,7 @@ class ActualizarJugadorUC @Inject constructor(
       if (actualizados == 1) {
         Respuesta.Valor(true)
       } else {
-        Respuesta.Error("No se ha podido actualiar el jugador ${jugador.nombre} para $explicacionActualizacion")
+        Respuesta.Error("No se ha podido actualizar el jugador ${jugador.nombre} para $explicacionActualizacion")
       }
     }
   }

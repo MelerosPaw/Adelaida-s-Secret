@@ -11,7 +11,6 @@ import com.example.composetest.data.db.dao.SospechosoDAO
 import com.example.composetest.data.db.dao.SospechosoYContenidoDAO
 import com.example.composetest.data.db.dao.TableroDAO
 import com.example.composetest.data.db.dbo.CasillaDBO
-import com.example.composetest.data.db.dbo.ComodinDBO
 import com.example.composetest.data.db.dbo.ContenidoPistaDBO
 import com.example.composetest.data.db.dbo.ElementoCartaDBO
 import com.example.composetest.data.db.dbo.ElementoPistaDBO

@@ -17,7 +17,7 @@ interface JugadorDAO {
 
     @Query("UPDATE JugadorDBO SET nombre = :nombreNuevo " +
            "WHERE JugadorDBO.nombre = :nombreAnterior AND JugadorDBO.partida = :idPartida")
-    fun cambiarNombre(nombreAnterior: String, idPartida: Long, nombreNuevo: String)
+    fun cambiarNombre(nombreNuevo: String, nombreAnterior: String, idPartida: Long)
 
     @Query("SELECT * FROM JugadorDBO WHERE JugadorDBO.partida = :idPartida AND JugadorDBO.nombre = :nombreJugador")
     fun obtener(idPartida: Long, nombreJugador: String): JugadorCompleto?

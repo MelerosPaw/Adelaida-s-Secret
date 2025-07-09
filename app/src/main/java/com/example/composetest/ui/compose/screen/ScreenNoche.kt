@@ -155,16 +155,14 @@ private fun DialogoSeleccionBaremos(estados: Estados, consumidor: Consumidor) {
     estadoBaremos?.let {
         AdelaidaDialog(cerrarDialogoBaremos, DialogProperties(true, true, false), contentMustScroll = false) {
             val state = rememberListadoBaremosState(it.baremoSeleccionado, it.baremosNoSeleccionables)
-            ListadoBaremos(state, it.jugador, it.baremos, { jugador, baremo -> consumidor.consumir(GuardarBaremo(jugador, baremo)) }, cerrarDialogoBaremos)
+            ListadoBaremos(state, it.jugador, it.baremos, { jugador, baremo ->
+                consumidor.consumir(GuardarBaremo(jugador, baremo)) }, cerrarDialogoBaremos)
         }
     }
 }
 
 @Composable
-private fun DialogoConfirmarEjecucionAhora(
-    estados: Estados,
-    consumidor: Consumidor,
-) {
+private fun DialogoConfirmarEjecucionAhora(estados: Estados, consumidor: Consumidor) {
     val confirmarEjecutarEvento by remember { estados.confirmarEjecutarEvento }
 
     confirmarEjecutarEvento?.let { evento ->
@@ -182,10 +180,7 @@ private fun DialogoConfirmarEjecucionAhora(
 }
 
 @Composable
-private fun SeccionEvento(
-    estados: Estados,
-    consumidor: Consumidor,
-) {
+private fun SeccionEvento(estados: Estados, consumidor: Consumidor) {
     val eventoSeleccionado by remember { estados.eventoSeleccionado }
     val mostrarDialogo by remember { estados.mostrarDialogoSeleccionManualEvento }
     val yaSeHaRealizado by remember { estados.yaSeHaRealizado }
@@ -228,13 +223,12 @@ private fun TituloEventoYBotones(
             TextAlign.Center.takeIf { !esLandscape } ?: TextAlign.Start
         )
         FlowRow(horizontalArrangement = Arrangement.End.takeIf { isLandscape() } ?: Arrangement.Center) {
-            val medidaBoton = Modifier.fillMaxWidth()
-                .takeUnless { esLandscape }
-                ?: Modifier.wrapContentWidth()
+            val medidaBoton = Modifier.fillMaxWidth().takeUnless { esLandscape } ?: Modifier.wrapContentWidth()
 
             if (!yaSeHaRealizado) {
                 AdelaidaButton(seleccionEventoAleatorio, "ALEATORIO", Modifier.padding(end = margenFin).then(medidaBoton))
                 AdelaidaButton(seleccionManual, "SELECCIÓN MANUAL", medidaBoton)
+
                 if (eventoSeleccionado?.sePuedeEjecutarAhora == true) {
                     AdelaidaButton(realizarEvento, "REALIZAR", Modifier.padding(end = margenFin).then(medidaBoton))
                 }
