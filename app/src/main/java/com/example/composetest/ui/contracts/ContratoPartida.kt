@@ -49,11 +49,15 @@ class EstadoPartida {
     }
   }
 
-  fun setPartida(partida: PartidaModelo) {
+  fun setPartida(partida: PartidaModelo, haCambiadoDeRonda: Boolean) {
     set(Estado.Partida(partida))
-    set(Estado.TabActual(TabData.obtenerPorRonda(partida.ronda)))
+
+    if (tabActual.value.tab == null || haCambiadoDeRonda) {
+      set(Estado.TabActual(TabData.obtenerPorRonda(partida.ronda)))
+    }
+
     set(Estado.Tablero(partida.tablero?.let { EstadoTablero(it, obtenerElementosFueraDelTablero(partida)) }))
-    set(Estado.EstadoInfoTab(partida))
+    set(Estado.EstadoInfoTab(partida.fuerzaDefensa))
   }
 
   private fun obtenerElementosFueraDelTablero(partida: Partida): List<ElementoTablero> =
@@ -66,7 +70,7 @@ class EstadoPartida {
     class TabActual(val tab: TabData?) : Estado()
     class Tablero(val estadoTablero: EstadoTablero?) : Estado()
     class AsuntoTurbioActual(val asuntoTurbio: AsuntoTurbio) : Estado()
-    class EstadoInfoTab(val partida: PartidaModelo?) : Estado()
+    class EstadoInfoTab(val fuerzaDefensa: Int?) : Estado()
     class InfoAccionProhibida(val estado: EstadoAccionProhibida): Estado()
     class EstadoInfoRonda(val infoRonda: InfoRonda?): Estado()
   }

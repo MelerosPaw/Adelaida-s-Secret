@@ -208,14 +208,15 @@ class PartidaViewModel @Inject constructor(
 
     private fun onPartidaActualizada(partida: Partida?) {
         partida?.let {
-            initGestorRonda(it)
-            estado.setPartida(it)
-            initInfoRonda(it)
+            val haCambiadoDeRonda = it.ronda != estado.infoRonda.value.infoRonda?.ronda
+            initGestorRonda(it, haCambiadoDeRonda)
+            estado.setPartida(it, haCambiadoDeRonda)
+            initInfoRonda(it, haCambiadoDeRonda)
         }
     }
 
-    private fun initGestorRonda(partida: Partida) {
-        if (gestorRonda == null || gestorRonda?.esOtraRonda(partida.ronda) == true) {
+    private fun initGestorRonda(partida: Partida, haCambiadoDeRonda: Boolean) {
+        if (gestorRonda == null || haCambiadoDeRonda) {
             gestorRonda = GestorRonda.Factory.from(partida.ronda) { mensaje ->
                 consumidor.consumir(IntencionPartida.MostrarMensaje(mensaje))
             }
@@ -226,9 +227,9 @@ class PartidaViewModel @Inject constructor(
      * Cuando cambia la partida, solo debemos actualizar la información de la ronda si ha cambiado
      * la ronda. Cualquier otro cambio sobre la ronda se modificará en su sitio.
      */
-    private fun initInfoRonda(partida: Partida) {
-        with(partida.ronda) {
-            if (this != estado.infoRonda.value.infoRonda?.ronda) {
+    private fun initInfoRonda(partida: Partida, haCambiadoDeRonda: Boolean) {
+        if (haCambiadoDeRonda) {
+            with(partida.ronda) {
                 estado.set(
                     EstadoPartida.Estado.EstadoInfoRonda(
                         InfoRonda(

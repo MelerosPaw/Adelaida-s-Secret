@@ -547,9 +547,8 @@ private fun ScreenPartidaPreview() {
         viewModel.getExplicacionEsHtml(partida.ronda),
         true,
     )
-    estado.setPartida(partida)
+    estado.setPartida(partida, false)
     estado.set(EstadoPartida.Estado.EstadoInfoRonda(infoRonda))
-
 
     ScreenPartida(
         {},

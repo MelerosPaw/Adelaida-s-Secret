@@ -30,17 +30,14 @@ import com.example.composetest.ui.compose.widget.NivelTitulo
 import com.example.composetest.ui.compose.widget.Titulo
 import com.example.composetest.ui.contracts.ConsumidorTabInfo
 import com.example.composetest.ui.contracts.EstadoPartida
-import com.example.composetest.ui.contracts.EstadoTabInfo
 import com.example.composetest.ui.contracts.IntencionTabInfo
 
 @Composable
 fun TabInfo(estado: EstadoPartida.Estado.EstadoInfoTab, consumidor: ConsumidorTabInfo) {
-  estado.partida?.let {
     Column {
       FuerzaDefensa(estado, consumidor)
       Abandonar(consumidor)
     }
-  }
 }
 
 @Composable
@@ -60,7 +57,7 @@ private fun FuerzaDefensa(estado: EstadoPartida.Estado.EstadoInfoTab, consumidor
           .padding(vertical = 10.dp, horizontal = 12.dp)
       ) {
         AdelaidaText(
-          text = estado.partida?.fuerzaDefensa?.toString() ?: "?",
+          text = estado.fuerzaDefensa?.toString() ?: "?",
           fontWeight = FontWeight.Black,
           color = Color(0xFF0C2684),
         )
@@ -96,7 +93,7 @@ private fun PreviewTabInfo() {
 
   ScreenPreviewMarron {
     TabInfo(
-      estado = EstadoPartida.Estado.EstadoInfoTab(partida),
+      estado = EstadoPartida.Estado.EstadoInfoTab(partida.fuerzaDefensa),
       ConsumidorTabInfo.Dummy
     )
   }
