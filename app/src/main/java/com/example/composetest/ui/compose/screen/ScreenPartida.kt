@@ -42,7 +42,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.composetest.R
@@ -87,6 +86,7 @@ import com.example.composetest.ui.contracts.IntencionPartida
 import com.example.composetest.ui.contracts.IntencionTabInfo
 import com.example.composetest.ui.manager.AsuntoTurbio
 import com.example.composetest.ui.manager.AsuntoTurbio.Ninguno
+import com.example.composetest.ui.manager.GestorRonda
 import com.example.composetest.ui.viewmodel.PartidaViewModel
 import com.example.composetest.ui.viewmodel.PartidaViewModel.InfoRonda
 import kotlinx.coroutines.delay
@@ -534,20 +534,20 @@ private fun ColumnScope.VisorPartida(
 @Preview
 @Composable
 private fun ScreenPartidaPreview() {
-    val viewModel = PartidaViewModel(SavedStateHandle())
     val partida = partidas(1)[0]
     val estado = EstadoPartida()
+    val gestorRonda = GestorRonda.Factory.from(partida.ronda, {})
     val infoRonda = InfoRonda(
         partida.ronda,
         12,
-        false, viewModel.getPreguntaSiguienteRonda(partida.ronda),
+        false, gestorRonda!!.getPreguntaSiguienteRonda(partida.ronda),
         false,
-        viewModel.getSubtitulo(partida.ronda),
-        viewModel.getExplicacion(partida.ronda),
-        viewModel.getExplicacionEsHtml(partida.ronda),
+        gestorRonda.getSubtitulo(partida.ronda),
+        gestorRonda.getExplicacion(partida.ronda),
+        gestorRonda.getExplicacionEsHtml(partida.ronda),
         true,
     )
-    estado.setPartida(partida, false)
+    estado.setPartida(partida, false, gestorRonda)
     estado.set(EstadoPartida.Estado.EstadoInfoRonda(infoRonda))
 
     ScreenPartida(

@@ -6,7 +6,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.toRoute
-import com.example.composetest.R
 import com.example.composetest.data.uc.ActualizarNombrePartidaUC
 import com.example.composetest.data.uc.ActualizarRondaUC
 import com.example.composetest.data.uc.ObtenerPartidaFlowUC
@@ -210,8 +209,10 @@ class PartidaViewModel @Inject constructor(
         partida?.let {
             val haCambiadoDeRonda = it.ronda != estado.infoRonda.value.infoRonda?.ronda
             initGestorRonda(it, haCambiadoDeRonda)
-            estado.setPartida(it, haCambiadoDeRonda)
-            initInfoRonda(it, haCambiadoDeRonda)
+
+            gestorRonda?.let { gestor ->
+                estado.setPartida(it, haCambiadoDeRonda, gestor)
+            }
         }
     }
 
@@ -221,65 +222,6 @@ class PartidaViewModel @Inject constructor(
                 consumidor.consumir(IntencionPartida.MostrarMensaje(mensaje))
             }
         }
-    }
-
-    /**
-     * Cuando cambia la partida, solo debemos actualizar la información de la ronda si ha cambiado
-     * la ronda. Cualquier otro cambio sobre la ronda se modificará en su sitio.
-     */
-    private fun initInfoRonda(partida: Partida, haCambiadoDeRonda: Boolean) {
-        if (haCambiadoDeRonda) {
-            with(partida.ronda) {
-                estado.set(
-                    EstadoPartida.Estado.EstadoInfoRonda(
-                        InfoRonda(
-                            ronda = this,
-                            dia = partida.dia,
-                            mostrarDialogoSiguienteRonda = false,
-                            preguntaSiguienteRonda = getPreguntaSiguienteRonda(this),
-                            explicacionVisible = false,
-                            subtitulo = getSubtitulo(this),
-                            explicacion = getExplicacion(this),
-                            explicacionEsHTMTL = getExplicacionEsHtml(this),
-                            mostrarTituloSiguienteRonda = true,
-                        )
-                    )
-                )
-            }
-        }
-    }
-
-    @StringRes
-    fun getSubtitulo(ronda: Ronda): Int? = when(ronda) {
-        Ronda.MEDIODIA -> R.string.alias_ronda_mediodia
-        Ronda.TARDE -> R.string.alias_ronda_tarde
-        Ronda.NOCHE, Ronda.NO_VALIDO, Ronda.MANANA -> null
-    }
-
-    @StringRes
-    fun getExplicacion(ronda: Ronda): Int = when(ronda) {
-        Ronda.MANANA -> R.string.explicacion_manana
-        Ronda.MEDIODIA -> R.string.explicacion_mediodia
-        Ronda.TARDE -> R.string.explicacion_tarde
-        Ronda.NOCHE -> R.string.explicacion_primera_noche
-        Ronda.NO_VALIDO -> R.string.no_valido
-    }
-
-    fun getExplicacionEsHtml(ronda: Ronda): Boolean = when(ronda) {
-        Ronda.MANANA -> false
-        Ronda.MEDIODIA -> false
-        Ronda.TARDE -> true
-        Ronda.NOCHE -> false
-        Ronda.NO_VALIDO -> false
-    }
-
-    @StringRes
-    fun getPreguntaSiguienteRonda(ronda: Ronda): Int = when(ronda) {
-        Ronda.MANANA -> R.string.pregunta_fin_manana
-        Ronda.MEDIODIA -> R.string.pregunta_fin_mediodia
-        Ronda.TARDE -> R.string.pregunta_fin_tarde
-        Ronda.NOCHE -> R.string.pregunta_fin_noche
-        Ronda.NO_VALIDO -> R.string.no_valido
     }
 
     private fun navegarASiguienteRonda(partida: Partida) {

@@ -10,6 +10,7 @@ import com.example.composetest.ui.compose.EstadoAccionProhibida
 import com.example.composetest.ui.compose.TabData
 import com.example.composetest.ui.compose.navegacion.Mensaje
 import com.example.composetest.ui.manager.AsuntoTurbio
+import com.example.composetest.ui.manager.GestorRonda
 import com.example.composetest.ui.viewmodel.MediodiaTardeViewModel.EstadoTablero
 import com.example.composetest.ui.viewmodel.PartidaViewModel.InfoRonda
 
@@ -49,21 +50,45 @@ class EstadoPartida {
     }
   }
 
-  fun setPartida(partida: PartidaModelo, haCambiadoDeRonda: Boolean) {
+  fun setPartida(partida: Partida, haCambiadoDeRonda: Boolean, gestorRonda: GestorRonda) {
     set(Estado.Partida(partida))
+    set(Estado.Tablero(partida.tablero?.let { EstadoTablero(it, obtenerElementosFueraDelTablero(partida)) }))
+    set(Estado.EstadoInfoTab(partida.fuerzaDefensa))
+    initInfoRonda(partida, haCambiadoDeRonda, gestorRonda)
 
     if (tabActual.value.tab == null || haCambiadoDeRonda) {
       set(Estado.TabActual(TabData.obtenerPorRonda(partida.ronda)))
     }
-
-    set(Estado.Tablero(partida.tablero?.let { EstadoTablero(it, obtenerElementosFueraDelTablero(partida)) }))
-    set(Estado.EstadoInfoTab(partida.fuerzaDefensa))
   }
 
   private fun obtenerElementosFueraDelTablero(partida: Partida): List<ElementoTablero> =
-    partida.jugadores.flatMap {
-      it.cartas() + it.pistas()
+    partida.jugadores.flatMap { it.cartas() + it.pistas() }
+
+  /**
+   * Cuando cambia la partida, solo debemos actualizar la información de la ronda si ha cambiado
+   * la ronda. Cualquier otro cambio sobre la ronda se modificará en su sitio.
+   */
+  private fun initInfoRonda(partida: Partida, haCambiadoDeRonda: Boolean, gestorRonda: GestorRonda) {
+    if (haCambiadoDeRonda) {
+      with(partida.ronda) {
+        set(
+          Estado.EstadoInfoRonda(
+            InfoRonda(
+              ronda = this,
+              dia = partida.dia,
+              mostrarDialogoSiguienteRonda = false,
+              preguntaSiguienteRonda = gestorRonda.getPreguntaSiguienteRonda(this),
+              explicacionVisible = false,
+              subtitulo = gestorRonda.getSubtitulo(this),
+              explicacion = gestorRonda.getExplicacion(this),
+              explicacionEsHTMTL = gestorRonda.getExplicacionEsHtml(this),
+              mostrarTituloSiguienteRonda = true,
+            )
+          )
+        )
+      }
     }
+  }
 
   sealed class Estado {
     class Partida(val partida: PartidaModelo?) : Estado()

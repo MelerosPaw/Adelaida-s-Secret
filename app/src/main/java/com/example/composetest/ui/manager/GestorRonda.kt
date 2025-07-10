@@ -7,6 +7,7 @@ import com.example.composetest.model.ElementoTablero
 import com.example.composetest.model.Evento
 import com.example.composetest.model.Jugador
 import com.example.composetest.model.Partida
+import com.example.composetest.model.Partida.Ronda
 import com.example.composetest.ui.compose.PosibleAccionProhibida
 import com.example.composetest.ui.compose.TabData
 import com.example.composetest.ui.compose.navegacion.Mensaje
@@ -18,6 +19,40 @@ interface GestorRonda {
     fun getTabInicial(): TabData
 
     fun seEjecutaAhora(evento: Evento): Boolean
+
+    // TODO Melero: 10/7/25 Pasar a cada gestor cuanddo estén
+    @StringRes
+    fun getPreguntaSiguienteRonda(ronda: Ronda): Int = when(ronda) {
+        Ronda.MANANA -> R.string.pregunta_fin_manana
+        Ronda.MEDIODIA -> R.string.pregunta_fin_mediodia
+        Ronda.TARDE -> R.string.pregunta_fin_tarde
+        Ronda.NOCHE -> R.string.pregunta_fin_noche
+        Ronda.NO_VALIDO -> R.string.no_valido
+    }
+
+    @StringRes
+    fun getSubtitulo(ronda: Ronda): Int? = when(ronda) {
+        Ronda.MEDIODIA -> R.string.alias_ronda_mediodia
+        Ronda.TARDE -> R.string.alias_ronda_tarde
+        Ronda.NOCHE, Ronda.NO_VALIDO, Ronda.MANANA -> null
+    }
+
+    @StringRes
+    fun getExplicacion(ronda: Ronda): Int = when(ronda) {
+        Ronda.MANANA -> R.string.explicacion_manana
+        Ronda.MEDIODIA -> R.string.explicacion_mediodia
+        Ronda.TARDE -> R.string.explicacion_tarde
+        Ronda.NOCHE -> R.string.explicacion_primera_noche
+        Ronda.NO_VALIDO -> R.string.no_valido
+    }
+
+    fun getExplicacionEsHtml(ronda: Ronda): Boolean = when(ronda) {
+        Ronda.MANANA -> false
+        Ronda.MEDIODIA -> false
+        Ronda.TARDE -> true
+        Ronda.NOCHE -> false
+        Ronda.NO_VALIDO -> false
+    }
 
     @StringRes
     fun advertenciaAccionProhibida(posibleAccionProhibida: PosibleAccionProhibida): Int?
@@ -80,13 +115,14 @@ interface GestorRonda {
         companion object {
 
             fun from(
-                ronda: Partida.Ronda,
+                ronda: Ronda,
                 mostrarMensaje: (mensaje: Mensaje) -> Unit,
             ): GestorRonda? = when (ronda) {
-                Partida.Ronda.MEDIODIA -> GestorRondaMediodia(mostrarMensaje)
-                Partida.Ronda.TARDE -> GestorRondaTarde(mostrarMensaje)
-                Partida.Ronda.NOCHE -> GestorRondaNoche(mostrarMensaje)
-                else -> null /* No hay más rondas que usen la misma pantalla. */
+                Ronda.MEDIODIA -> GestorRondaMediodia(mostrarMensaje)
+                Ronda.TARDE -> GestorRondaTarde(mostrarMensaje)
+                Ronda.NOCHE -> GestorRondaNoche(mostrarMensaje)
+                Ronda.MANANA -> null // TODO Melero: 10/7/25 Por hacer
+                Ronda.NO_VALIDO -> null
             }
         }
     }
