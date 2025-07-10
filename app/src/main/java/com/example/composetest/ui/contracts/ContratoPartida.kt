@@ -11,6 +11,7 @@ import com.example.composetest.ui.compose.TabData
 import com.example.composetest.ui.compose.navegacion.Mensaje
 import com.example.composetest.ui.manager.AsuntoTurbio
 import com.example.composetest.ui.viewmodel.MediodiaTardeViewModel.EstadoTablero
+import com.example.composetest.ui.viewmodel.PartidaViewModel.InfoRonda
 
 typealias PartidaModelo = Partida
 
@@ -26,6 +27,7 @@ class EstadoPartida {
   private val _infoAccionProhibida: MutableState<Estado.InfoAccionProhibida> = mutableStateOf(
     Estado.InfoAccionProhibida(EstadoAccionProhibida(null, null))
   )
+  private val _infoRonda: MutableState<Estado.EstadoInfoRonda> = mutableStateOf(Estado.EstadoInfoRonda(null))
 
   val partida: State<Estado.Partida> = _partida
   val tabActual: State<Estado.TabActual> = _tabActual
@@ -33,6 +35,7 @@ class EstadoPartida {
   val asuntoTurbio: State<Estado.AsuntoTurbioActual> = _asuntoTurbioActual
   val estadoTabInfo: State<Estado.EstadoInfoTab> = _estadoTabInfo
   val infoAccionProhibida: State<Estado.InfoAccionProhibida> = _infoAccionProhibida
+  val infoRonda: State<Estado.EstadoInfoRonda> = _infoRonda
 
   fun set(estado: Estado) {
     when (estado) {
@@ -42,6 +45,7 @@ class EstadoPartida {
       is Estado.AsuntoTurbioActual -> _asuntoTurbioActual.value = estado
       is Estado.EstadoInfoTab -> _estadoTabInfo.value = estado
       is Estado.InfoAccionProhibida -> _infoAccionProhibida.value = estado
+      is Estado.EstadoInfoRonda -> _infoRonda.value = estado
     }
   }
 
@@ -64,6 +68,7 @@ class EstadoPartida {
     class AsuntoTurbioActual(val asuntoTurbio: AsuntoTurbio) : Estado()
     class EstadoInfoTab(val partida: PartidaModelo?) : Estado()
     class InfoAccionProhibida(val estado: EstadoAccionProhibida): Estado()
+    class EstadoInfoRonda(val infoRonda: InfoRonda?): Estado()
   }
 }
 

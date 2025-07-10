@@ -49,8 +49,6 @@ class PartidaViewModel @Inject constructor(
     var estado: EstadoPartida = EstadoPartida()
     private val _idPartida: MutableState<Long?> = mutableStateOf(null)
     val idPartida: State<Long?> = _idPartida
-    private val _infoRonda: MutableState<InfoRonda?> = mutableStateOf(null)
-    val infoRonda: State<InfoRonda?> = _infoRonda
     private val _filtrosAbiertos: MutableState<Boolean> = mutableStateOf(false)
     val filtrosAbiertos: State<Boolean> = _filtrosAbiertos
     private var _asuntoTurbio: MutableState<AsuntoTurbio> = mutableStateOf(AsuntoTurbio.Ninguno())
@@ -104,17 +102,21 @@ class PartidaViewModel @Inject constructor(
     }
 
     fun onMostrarDialogoCambioRonda(info: InfoRonda) {
-        _infoRonda.value = info.copy(
+        estado.set(EstadoPartida.Estado.EstadoInfoRonda(estado.infoRonda.value.infoRonda?.copy(
             mostrarDialogoSiguienteRonda = !info.mostrarDialogoSiguienteRonda,
-        )
+        )))
     }
 
     fun onCambiarVisibilidadExplicacionRonda(info: InfoRonda) {
-        _infoRonda.value = info.copy(explicacionVisible = !info.explicacionVisible)
+        estado.set(EstadoPartida.Estado.EstadoInfoRonda(estado.infoRonda.value.infoRonda?.copy(
+            explicacionVisible = !info.explicacionVisible))
+        )
     }
 
     fun onCerrarTituloSiguienteRonda(info: InfoRonda) {
-        _infoRonda.value = info.copy(mostrarTituloSiguienteRonda = false, explicacionVisible = true)
+        estado.set(EstadoPartida.Estado.EstadoInfoRonda(estado.infoRonda.value.infoRonda?.copy(
+            mostrarTituloSiguienteRonda = false, explicacionVisible = true))
+        )
     }
 
     fun actualizarNombrePartida(nuevoNombre: String) {
@@ -206,13 +208,17 @@ class PartidaViewModel @Inject constructor(
 
     private fun onPartidaActualizada(partida: Partida?) {
         partida?.let {
-            if (gestorRonda == null || gestorRonda?.esOtraRonda(it.ronda) == true) {
-                gestorRonda = GestorRonda.Factory.from(it.ronda) { mensaje ->
-                    consumidor.consumir(IntencionPartida.MostrarMensaje(mensaje))
-                }
-            }
+            initGestorRonda(it)
             estado.setPartida(it)
             initInfoRonda(it)
+        }
+    }
+
+    private fun initGestorRonda(partida: Partida) {
+        if (gestorRonda == null || gestorRonda?.esOtraRonda(partida.ronda) == true) {
+            gestorRonda = GestorRonda.Factory.from(partida.ronda) { mensaje ->
+                consumidor.consumir(IntencionPartida.MostrarMensaje(mensaje))
+            }
         }
     }
 
@@ -222,19 +228,22 @@ class PartidaViewModel @Inject constructor(
      */
     private fun initInfoRonda(partida: Partida) {
         with(partida.ronda) {
-            if (this != _infoRonda.value?.ronda) {
-                _infoRonda.value =
-                    InfoRonda(
-                        ronda = this,
-                        dia = partida.dia,
-                        mostrarDialogoSiguienteRonda = false,
-                        preguntaSiguienteRonda = getPreguntaSiguienteRonda(this),
-                        explicacionVisible = false,
-                        subtitulo = getSubtitulo(this),
-                        explicacion = getExplicacion(this),
-                        explicacionEsHTMTL = getExplicacionEsHtml(this),
-                        mostrarTituloSiguienteRonda = true,
+            if (this != estado.infoRonda.value.infoRonda?.ronda) {
+                estado.set(
+                    EstadoPartida.Estado.EstadoInfoRonda(
+                        InfoRonda(
+                            ronda = this,
+                            dia = partida.dia,
+                            mostrarDialogoSiguienteRonda = false,
+                            preguntaSiguienteRonda = getPreguntaSiguienteRonda(this),
+                            explicacionVisible = false,
+                            subtitulo = getSubtitulo(this),
+                            explicacion = getExplicacion(this),
+                            explicacionEsHTMTL = getExplicacionEsHtml(this),
+                            mostrarTituloSiguienteRonda = true,
+                        )
                     )
+                )
             }
         }
     }

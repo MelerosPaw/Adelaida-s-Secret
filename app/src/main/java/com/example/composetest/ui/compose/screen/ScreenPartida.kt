@@ -109,7 +109,6 @@ fun ScreenPartida(
         cambiarConfiguracionToolbar,
         viewModel.consumidor,
         viewModel.estado,
-        viewModel.infoRonda,
         viewModel::onCambioRondaSolicitado,
         viewModel::onMostrarDialogoCambioRonda,
         viewModel::onCambiarVisibilidadExplicacionRonda,
@@ -138,7 +137,6 @@ private fun ScreenPartida(
     cambiarConfiguracionToolbar: (NavegadorCreacion.ConfiguracionToolbar) -> Unit,
     consumidor: ConsumidorPartida,
     estado: EstadoPartida,
-    infoRonda: State<InfoRonda?>,
     onCambioRondaSolicitado: (InfoRonda) -> Unit,
     onMostrarDialogoCambioRonda: (InfoRonda) -> Unit,
     onCambiarVisibilidadInfoRonda: (InfoRonda) -> Unit,
@@ -161,7 +159,7 @@ private fun ScreenPartida(
     onSalir: () -> Unit,
 ) {
     val partida by remember { estado.partida }
-    val info by remember { infoRonda }
+    val info by remember { estado.infoRonda }
     val tabActual by remember { estado.tabActual }
     val asuntoTurbio by remember { estado.asuntoTurbio }
     val accionProhibida by remember { estado.infoAccionProhibida }
@@ -197,7 +195,7 @@ private fun ScreenPartida(
                 }
                 CancelarRobo(asuntoTurbio.asuntoTurbio !is Ninguno, cancelarCompra)
                 RondaSiguiente(
-                    info,
+                    info.infoRonda,
                     onCambioRondaSolicitado,
                     onMostrarDialogoCambioRonda
                 ) { onRondaSiguiente() }
@@ -210,7 +208,7 @@ private fun ScreenPartida(
         Box(Modifier.fillMaxSize(), propagateMinConstraints = true) {
             Column(Modifier.background(colorFondo)) {
                 BackHandler { onMostrarMensajeAbandonar(true) }
-                InfoRonda(info, onCambiarVisibilidadInfoRonda)
+                InfoRonda(info.infoRonda, onCambiarVisibilidadInfoRonda)
 //                VisorPartida(
 //                    partida, onMensaje, filtrosAbiertos, cerrarFiltros, onMostrarPapelera,
 //                    onNavegacionHabilitada, info?.solicitarCambioRonda == true,
@@ -225,7 +223,7 @@ private fun ScreenPartida(
                 )
             }
 
-            TituloInicioRonda(info, onOcultarTituloSiguienteRonda)
+            TituloInicioRonda(info.infoRonda, onOcultarTituloSiguienteRonda)
             DialogoAccionProhibida(accionProhibida.estado)
             DialogoSalir(mostrarDialogoSalir, onMostrarMensajeAbandonar, onSalir)
         }
@@ -536,11 +534,9 @@ private fun ColumnScope.VisorPartida(
 @Preview
 @Composable
 private fun ScreenPartidaPreview() {
+    val viewModel = PartidaViewModel(SavedStateHandle())
     val partida = partidas(1)[0]
     val estado = EstadoPartida()
-    estado.setPartida(partida)
-
-    val viewModel = PartidaViewModel(SavedStateHandle())
     val infoRonda = InfoRonda(
         partida.ronda,
         12,
@@ -551,12 +547,14 @@ private fun ScreenPartidaPreview() {
         viewModel.getExplicacionEsHtml(partida.ronda),
         true,
     )
+    estado.setPartida(partida)
+    estado.set(EstadoPartida.Estado.EstadoInfoRonda(infoRonda))
+
 
     ScreenPartida(
         {},
         ConsumidorPartida.Dummy(),
         estado,
-        mutableStateOf(infoRonda),
         {},
         {},
         {},
