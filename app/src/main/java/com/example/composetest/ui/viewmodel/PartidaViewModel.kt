@@ -27,6 +27,7 @@ import com.example.composetest.ui.contracts.IntencionPartida
 import com.example.composetest.ui.manager.AsuntoTurbio
 import com.example.composetest.ui.manager.GestorRonda
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -48,8 +49,6 @@ class PartidaViewModel @Inject constructor(
     var estado: EstadoPartida = EstadoPartida()
     private val _idPartida: MutableState<Long?> = mutableStateOf(null)
     val idPartida: State<Long?> = _idPartida
-    private val _partida: MutableState<Partida?> = mutableStateOf(null)
-    val partida: State<Partida?> = _partida
     private val _infoRonda: MutableState<InfoRonda?> = mutableStateOf(null)
     val infoRonda: State<InfoRonda?> = _infoRonda
     private val _filtrosAbiertos: MutableState<Boolean> = mutableStateOf(false)
@@ -92,7 +91,7 @@ class PartidaViewModel @Inject constructor(
     }
 
     private fun comprobarSiSePuedeCambiarDeRonda(infoRondaActual: InfoRonda) {
-        noneNull(partida.value, gestorRonda) { partida, gestor ->
+        noneNull(estado.partida.value.partida, gestorRonda) { partida, gestor ->
             onCondicionesCambioRondaSatisfechas(gestor.sePuedeCambiarDeRonda(partida), infoRondaActual)
         }
     }
@@ -106,7 +105,6 @@ class PartidaViewModel @Inject constructor(
     fun onMostrarDialogoCambioRonda(info: InfoRonda) {
         _infoRonda.value = info.copy(
             mostrarDialogoSiguienteRonda = !info.mostrarDialogoSiguienteRonda,
-            solicitarCambioRonda = false
         )
     }
 
@@ -167,7 +165,7 @@ class PartidaViewModel @Inject constructor(
     }
 
     fun onRondaSiguiente() {
-        partida.value?.let {
+        estado.partida.value.partida?.let {
             suspender {
                 val params = ActualizarRondaUC.Parametros(it)
                 actualizarRondaUC.get()
@@ -198,41 +196,45 @@ class PartidaViewModel @Inject constructor(
                 val params = ObtenerPartidaFlowUC.Parametros(partida)
                 obtenerPartidaFlowUC.get()
                     .invoke(params)
-                    .collect { respuesta ->
-                        respuesta.usarRespuesta { partida ->
-                            _partida.value = partida
-
-                            partida
-                                ?.takeIf { it.ronda != infoRonda.value?.ronda }
-                                ?.let {
-                                    if (gestorRonda == null || gestorRonda?.esOtraRonda(it.ronda) == true) {
-                                        gestorRonda = GestorRonda.Factory.from(it.ronda) { mensaje ->
-                                            consumidor.consumir(IntencionPartida.MostrarMensaje(mensaje))
-                                        }
-                                    }
-                                    estado.setPartida(it)
-                                    initInfoRonda(it)
-                                }
-                        }
+                    .collectLatest { respuesta ->
+                        respuesta.usarRespuesta { partida -> onPartidaActualizada(partida) }
                     }
             }
         }
     }
 
+    private fun onPartidaActualizada(partida: Partida?) {
+        partida?.let {
+            if (gestorRonda == null || gestorRonda?.esOtraRonda(it.ronda) == true) {
+                gestorRonda = GestorRonda.Factory.from(it.ronda) { mensaje ->
+                    consumidor.consumir(IntencionPartida.MostrarMensaje(mensaje))
+                }
+            }
+            estado.setPartida(it)
+            initInfoRonda(it)
+        }
+    }
+
+    /**
+     * Cuando cambia la partida, solo debemos actualizar la información de la ronda si ha cambiado
+     * la ronda. Cualquier otro cambio sobre la ronda se modificará en su sitio.
+     */
     private fun initInfoRonda(partida: Partida) {
-        _infoRonda.value = partida.ronda.let {
-            InfoRonda(
-                it,
-                partida.dia,
-                false,
-                getPreguntaSiguienteRonda(it),
-                false,
-                getSubtitulo(it),
-                getExplicacion(it),
-                getExplicacionEsHtml(it),
-                true,
-                false
-            )
+        with(partida.ronda) {
+            if (this != _infoRonda.value?.ronda) {
+                _infoRonda.value =
+                    InfoRonda(
+                        ronda = this,
+                        dia = partida.dia,
+                        mostrarDialogoSiguienteRonda = false,
+                        preguntaSiguienteRonda = getPreguntaSiguienteRonda(this),
+                        explicacionVisible = false,
+                        subtitulo = getSubtitulo(this),
+                        explicacion = getExplicacion(this),
+                        explicacionEsHTMTL = getExplicacionEsHtml(this),
+                        mostrarTituloSiguienteRonda = true,
+                    )
+            }
         }
     }
 
@@ -336,6 +338,5 @@ class PartidaViewModel @Inject constructor(
         @StringRes val explicacion: Int,
         val explicacionEsHTMTL: Boolean,
         val mostrarTituloSiguienteRonda: Boolean,
-        val solicitarCambioRonda: Boolean,
     )
 }

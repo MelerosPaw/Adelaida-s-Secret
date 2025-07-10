@@ -216,8 +216,8 @@ private fun ScreenPartida(
 //                    onNavegacionHabilitada, info?.solicitarCambioRonda == true,
 //                    onCondicionesCambioRondaSatisfechas
 //                )
-                Contenido(estado, consumidor, asuntoTurbio.asuntoTurbio, filtrosAbiertos,
-                    cerrarFiltros, {}
+                Contenido(estado, consumidor, partida.partida, tabActual.tab,
+                    asuntoTurbio.asuntoTurbio, filtrosAbiertos, cerrarFiltros, {}
                 )
                 BarraNavegacionPartida(
                     tabSeleccionada = tabActual.tab,
@@ -236,34 +236,34 @@ private fun ScreenPartida(
 private fun ColumnScope.Contenido(
     estado: EstadoPartida,
     consumidor: ConsumidorPartida,
+    partida: Partida?,
+    tabActual: TabData?,
     asuntoTurbio: AsuntoTurbio,
     filtrosAbiertos: State<Boolean>,
     cerrarFiltros: () -> Unit,
     onAccionProhibida: (AccionProhibida) -> Unit, // Mover muchas cosas
 ) {
-    val partida by remember { estado.partida }
-    val tabActual by remember { estado.tabActual }
     val estadoTablero by remember { estado.estadoTablero }
-    val jugadores = partida.partida?.jugadores?.toList()
+    val jugadores = partida?.jugadores?.toList()
 
     Box(Modifier.weight(1f)) {
         when {
-            tabActual.tab == null || partida.partida == null -> CargandoPartida()
-            tabActual.tab == TabData.TABLERO -> TabTableroPartida(
-                filtrosAbiertos, estadoTablero.estadoTablero, jugadores, partida.partida?.id,
+            tabActual == null || partida == null -> CargandoPartida()
+            tabActual == TabData.TABLERO -> TabTableroPartida(
+                filtrosAbiertos, estadoTablero.estadoTablero, jugadores, partida.id,
                 cerrarFiltros, onAccionProhibida
             )
-            tabActual.tab == TabData.JUGADORES -> TabJugadores(
-                asuntoTurbio, partida.partida?.id, jugadores,
+            tabActual == TabData.JUGADORES -> TabJugadores(
+                asuntoTurbio, partida.id, jugadores,
                 false, // TODO Melero: 6/7/25 Se tiene que poder alternar
                 { consumidor.consumir(IntencionPartida.IniciarAsuntoTurbio(it)) },
                 onAccionProhibida
             )
-            tabActual.tab == TabData.EVENTOS -> TabEventos(partida.partida) {
+            tabActual == TabData.EVENTOS -> TabEventos(partida) {
                 consumidor.consumir(IntencionPartida.MostrarMensaje(it))
             }
 
-            tabActual.tab == TabData.INFO -> {
+            tabActual == TabData.INFO -> {
                 val tabInfo by remember { estado.estadoTabInfo }
                 TabInfo(tabInfo, object : ConsumidorTabInfo {
                     override fun consumir(vararg intenciones: IntencionTabInfo) {
@@ -550,7 +550,6 @@ private fun ScreenPartidaPreview() {
         viewModel.getExplicacion(partida.ronda),
         viewModel.getExplicacionEsHtml(partida.ronda),
         true,
-        false
     )
 
     ScreenPartida(
@@ -596,7 +595,6 @@ private fun PreviewTituloInicioRonda() {
                 R.string.alias_ronda_mediodia,
                 false,
                 false,
-                false
             ), {}
         )
     }

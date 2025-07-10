@@ -318,6 +318,7 @@ class Estados(
   private val _confirmarEjecutarEvento: MutableState<EventoVO?> = mutableStateOf(confirmarEjecutarEvento.evento)
   private val _eventoRealizandose: MutableState<EventoRealizandose?> = mutableStateOf(eventoRealizandose.evento)
   private val _yaSeHaRealizado: MutableState<Boolean> = mutableStateOf(yaSeHaRealizado.realizado)
+
   val jugadores: State<List<Jugador>> = _jugadores
   val estadoDialogoBaremos: State<EstadoBaremos?> = _estadoDialogoBaremos
   val eventos: State<List<EventoVO>> = _eventos
