@@ -82,8 +82,8 @@ private fun CuadroDialogoElementoClicado(
     val elementoClicado by remember { viewModel.elementoClicado }
 
     noneNull(elementoClicado, jugadores, viewModel.idPartida) { elemento, jugadores, idPartida ->
-        DialogoElementoClicado(elemento.elemento, jugadores, elemento.poseedor, ConjuntoOpciones.TABLERO, idPartida,
-            onAccionProhibida) {
+        DialogoElementoClicado(elemento.elemento, jugadores, elemento.poseedor,
+            ConjuntoOpciones.TABLERO, idPartida, onAccionProhibida) {
             viewModel.cerrarDialogCasillaClicada()
         }
     }

@@ -217,9 +217,9 @@ private fun ScreenPartida(
 //                    onCondicionesCambioRondaSatisfechas
 //                )
                 Contenido(estado, consumidor, partida.partida, tabActual.tab,
-                    asuntoTurbio.asuntoTurbio, filtrosAbiertos, cerrarFiltros, {}
-                )
-                BarraNavegacionPartida(
+                    asuntoTurbio.asuntoTurbio, filtrosAbiertos, cerrarFiltros
+                ) { consumidor.consumir(IntencionPartida.TratarAccionProhibida(it)) }
+              BarraNavegacionPartida(
                     tabSeleccionada = tabActual.tab,
                     tabs = getTabs { consumidor.consumir(IntencionPartida.CambiarTab(it)) }
                 )
@@ -241,7 +241,7 @@ private fun ColumnScope.Contenido(
     asuntoTurbio: AsuntoTurbio,
     filtrosAbiertos: State<Boolean>,
     cerrarFiltros: () -> Unit,
-    onAccionProhibida: (AccionProhibida) -> Unit, // Mover muchas cosas
+    onAccionProhibida: (AccionProhibida) -> Unit
 ) {
     val estadoTablero by remember { estado.estadoTablero }
     val jugadores = partida?.jugadores?.toList()

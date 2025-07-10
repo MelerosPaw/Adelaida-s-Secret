@@ -22,6 +22,7 @@ import com.example.composetest.R
 import com.example.composetest.model.Tablero
 import com.example.composetest.model.aCaracter
 import com.example.composetest.ui.CasillaVO
+import com.example.composetest.ui.compose.theme.displayFontFamily
 import com.example.composetest.ui.compose.widget.AdelaidaText
 import com.example.composetest.ui.viewmodel.TableroViewModel
 
@@ -80,7 +81,7 @@ private fun FilaCasillas(
 @Composable
 private fun RowScope.CabeceraFila(id: Char) {
     TextoCentrado(texto = id.toString(), mantenerAlto = true, mantenerAncho = false,
-        fontFamily = FontFamily(Font(R.font.eczar)))
+        fontFamily = displayFontFamily)
 }
 
 @Composable

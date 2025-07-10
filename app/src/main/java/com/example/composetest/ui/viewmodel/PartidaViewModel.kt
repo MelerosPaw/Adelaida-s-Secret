@@ -75,6 +75,7 @@ class PartidaViewModel @Inject constructor(
                     is IntencionPartida.IniciarAsuntoTurbio -> iniciarAsuntoTurbio(it.asuntoTurbio)
                     IntencionPartida.MostrarDialogoAbandonar -> onMostrarDialogoAbandonarCambiado(true)
                     is IntencionPartida.CambiarTab -> cambiarPaginaActual(it.nuevaTab)
+                    is IntencionPartida.TratarAccionProhibida -> onAccionProhibida(it.accionProhibida)
                 }
             }
         }

@@ -19,6 +19,12 @@ fun TabTableroPartida(
   val filtrosAbiertos by remember { filtrosAbiertos }
 
   TabTablero(
-    tablero?.tablero, tablero?.elementosFueraDelTablero, idPartida, jugadores, filtrosAbiertos,
-    { cerrarFiltros() }, onAccionProhibida)
+    tablero = tablero?.tablero,
+    elementosFueraDelTablero = tablero?.elementosFueraDelTablero,
+    idPartida = idPartida,
+    jugadores = jugadores,
+    filtroAbierto = filtrosAbiertos,
+    onFiltrosDismissed = { cerrarFiltros() },
+    onAccionProhibida = onAccionProhibida
+  )
 }

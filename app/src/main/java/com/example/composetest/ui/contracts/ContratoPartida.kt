@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.example.composetest.model.ElementoTablero
 import com.example.composetest.model.Partida
+import com.example.composetest.ui.compose.AccionProhibida
 import com.example.composetest.ui.compose.EstadoAccionProhibida
 import com.example.composetest.ui.compose.TabData
 import com.example.composetest.ui.compose.navegacion.Mensaje
@@ -67,9 +68,10 @@ class EstadoPartida {
 }
 
 sealed class IntencionPartida: MVIIntencion {
+  class CambiarTab(val nuevaTab: TabData): IntencionPartida()
   class MostrarMensaje(val mensaje: Mensaje): IntencionPartida()
   class IniciarAsuntoTurbio(val asuntoTurbio: AsuntoTurbio): IntencionPartida()
-  class CambiarTab(val nuevaTab: TabData): IntencionPartida()
+  class TratarAccionProhibida(val accionProhibida: AccionProhibida): IntencionPartida()
   object MostrarDialogoAbandonar: IntencionPartida()
 }
 
