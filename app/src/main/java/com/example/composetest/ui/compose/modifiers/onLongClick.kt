@@ -30,11 +30,11 @@ fun Modifier.onLongClick(
     onBeingLongPressed: (isLongClicked: Boolean) -> Unit = {},
     enabled: Boolean = true,
     onLongClicked: () -> Unit,
-): Modifier = composed {
+): Modifier {
     val interactionSource = remember { MutableInteractionSource() }
-    var isLongClicked = remember { mutableStateOf(false) }
+    val isLongClicked = remember { mutableStateOf(false) }
 
-    Modifier
+    return this
         .indication(interactionSource, LocalIndication.current)
         .pointerInput(Unit) {
             detectTapGestures(
@@ -59,5 +59,4 @@ fun Modifier.onLongClick(
                 onTap = { onClicked?.invoke() }
             )
         }
-
 }

@@ -6,6 +6,7 @@
     coreKtx = "1.13.1"
     junit = "4.13.2"
     junitVersion = "1.2.1"
+    mockk = "1.13.16"
     espressoCore = "3.6.1"
     serializable = "1.7.3"
     lifecycle = "2.8.7"
@@ -49,6 +50,7 @@
     navigation-viewmodel = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "navigationViewModel" }
     coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
     junit = { group = "junit", name = "junit", version.ref = "junit" }
+    mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
     androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
     androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 

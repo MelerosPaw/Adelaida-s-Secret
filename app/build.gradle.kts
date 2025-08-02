@@ -74,7 +74,9 @@ dependencies {
   implementation(libs.androidx.runtime.livedata)
   implementation(libs.accompanist.pager.indicator)
 
+  // Testing
   testImplementation(libs.junit)
+  testImplementation(libs.mockk)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
   androidTestImplementation(platform(libs.androidx.compose.bom))

@@ -5,6 +5,7 @@ import com.example.composetest.model.ElementoTablero.Carta.Brandy
 import com.example.composetest.model.ElementoTablero.Carta.Dinero
 import com.example.composetest.model.ElementoTablero.Carta.Llave
 import com.example.composetest.model.ElementoTablero.Carta.Perseskud
+import com.example.composetest.model.ElementoTablero.Carta.Reputacion
 import com.example.composetest.model.ElementoTablero.Pista.Coartada
 import com.example.composetest.model.ElementoTablero.Pista.Habito
 import com.example.composetest.model.ElementoTablero.Pista.Objeto
@@ -35,7 +36,7 @@ fun Char.aNumero(): Int = code - caracterPrevioAbecedario
  * [Habitacion.Salon], no se podrá colocar. Así que barajamos hasta que el penúltimo no sea el secreto falso.
  */
 private fun producirSecretos(): Array<ElementoTablero.Pista> = Array(11) {
-    if (it == 0) PistaFalsa(ElementoTablero.Pista.Prefijo.SECRETO, 1) else Secreto(it)
+    if (it == 0) PistaFalsa(ElementoTablero.Pista.Prefijo.SECRETO, 1, 0) else Secreto(it)
 }.apply {
     shuffle()
 
