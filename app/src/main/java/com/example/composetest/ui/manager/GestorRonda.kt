@@ -14,11 +14,14 @@ import com.example.composetest.ui.compose.navegacion.Mensaje
 
 interface GestorRonda {
 
+    val rondaActual: Ronda
     val mostrarMensaje: (mensaje: Mensaje) -> Unit
 
     fun getTabInicial(): TabData
 
-    fun seEjecutaAhora(evento: Evento): Boolean
+    fun seEjecutaAhora(evento: Evento): Boolean = evento.ronda == rondaActual
+
+    fun esOtraRonda(ronda: Ronda): Boolean = ronda != rondaActual
 
     // TODO Melero: 10/7/25 Pasar a cada gestor cuanddo estén
     @StringRes
@@ -27,23 +30,23 @@ interface GestorRonda {
         Ronda.MEDIODIA -> R.string.pregunta_fin_mediodia
         Ronda.TARDE -> R.string.pregunta_fin_tarde
         Ronda.NOCHE -> R.string.pregunta_fin_noche
-        Ronda.NO_VALIDO -> R.string.no_valido
+        Ronda.NO_VALIDA -> R.string.no_valido
     }
 
     @StringRes
     fun getSubtitulo(ronda: Ronda): Int? = when(ronda) {
         Ronda.MEDIODIA -> R.string.alias_ronda_mediodia
         Ronda.TARDE -> R.string.alias_ronda_tarde
-        Ronda.NOCHE, Ronda.NO_VALIDO, Ronda.MANANA -> null
+        Ronda.NOCHE, Ronda.NO_VALIDA, Ronda.MANANA -> null
     }
 
     @StringRes
-    fun getExplicacion(ronda: Ronda): Int = when(ronda) {
+    fun getExplicacion(ronda: Ronda, dia: Int): Int = when(ronda) {
         Ronda.MANANA -> R.string.explicacion_manana
         Ronda.MEDIODIA -> R.string.explicacion_mediodia
         Ronda.TARDE -> R.string.explicacion_tarde
-        Ronda.NOCHE -> R.string.explicacion_primera_noche
-        Ronda.NO_VALIDO -> R.string.no_valido
+        Ronda.NOCHE -> R.string.explicacion_primera_noche.takeIf { dia == 1 } ?: R.string.explicacion_demas_noches
+        Ronda.NO_VALIDA -> R.string.no_valido
     }
 
     fun getExplicacionEsHtml(ronda: Ronda): Boolean = when(ronda) {
@@ -51,7 +54,7 @@ interface GestorRonda {
         Ronda.MEDIODIA -> false
         Ronda.TARDE -> true
         Ronda.NOCHE -> false
-        Ronda.NO_VALIDO -> false
+        Ronda.NO_VALIDA -> false
     }
 
     @StringRes
@@ -69,10 +72,15 @@ interface GestorRonda {
      * * No hay evento o no es para esta ronda, o ya se ha realizado.
      */
     fun sePuedeCambiarDeRonda(partida: Partida): Boolean {
+        val validacionesComunes = validacionesComunes(partida)
+        mostrarMensajeSiNoEsValido(*validacionesComunes.toTypedArray())
+        return validacionesComunes.all { it.valido }
+    }
+
+    fun validacionesComunes(partida: Partida): List<Validacion> {
         val noHayJugadoresConMasPistasDelLimite = comprobarLimitePistas(partida)
         val elEventoYaSeHaRealizadoONoEsParaEstaRonda = comprobarEvento(partida)
-        mostrarMensajeSiNoEsValido(noHayJugadoresConMasPistasDelLimite, elEventoYaSeHaRealizadoONoEsParaEstaRonda)
-        return noHayJugadoresConMasPistasDelLimite.valido && elEventoYaSeHaRealizadoONoEsParaEstaRonda.valido
+        return listOf(noHayJugadoresConMasPistasDelLimite, elEventoYaSeHaRealizadoONoEsParaEstaRonda)
     }
 
     fun mostrarMensajeSiNoEsValido(vararg validaciones: Validacion) {
@@ -82,8 +90,6 @@ interface GestorRonda {
             .takeIf { it.isNotBlank() }
             ?.let { mostrarMensaje(Mensaje("No se puede cambiar de ronda aún:\n\n$it")) }
     }
-
-    fun esOtraRonda(ronda: Partida.Ronda): Boolean
 
     private fun comprobarLimitePistas(partida: Partida): Validacion {
         val jugadoresConDemasiadasPistas = partida.jugadores.filter { it.tieneDemasiadasPistas() }
@@ -100,15 +106,25 @@ interface GestorRonda {
             "$deben deshacerse de una de ellas para poder continuar."
     }
 
-    private fun comprobarEvento(partida: Partida): Validacion {
-        val noHayEvento = partida.eventoActual == null
+    fun comprobarEvento(partida: Partida): Validacion {
+        val hayEvento = partida.eventoActual != null
         val elEventoSeHaEjecutado = partida.eventoActualEjecutado
-        val elEventoNoVaEnEstaRonda = !noHayEvento && !seEjecutaAhora(partida.eventoActual)
-        val okWithEvent = noHayEvento || elEventoSeHaEjecutado || elEventoNoVaEnEstaRonda
+        val elEventoVaEnEstaRonda = hayEvento && seEjecutaAhora(partida.eventoActual)
 
-        val mensaje = "El evento sucede en esta ronda y aún no se ha realizado.".takeIf { !okWithEvent }
-        return Validacion(okWithEvent, mensaje)
+        val yaSeHaEjecutado = !hayEvento && elEventoSeHaEjecutado
+        val noEsEnEstaRonda = hayEvento && !elEventoSeHaEjecutado && !elEventoVaEnEstaRonda
+        val pendienteEjecucion = hayEvento && !elEventoSeHaEjecutado && elEventoVaEnEstaRonda
+        val hayQueSeleccionarEventoNuevo = hayQueSeleccionarEventoNuevo(hayEvento)
+
+        val mensaje = when {
+            pendienteEjecucion -> "El evento sucede en esta ronda y aún no se ha realizado."
+            hayQueSeleccionarEventoNuevo -> "Aún no se ha seleccionado evento."
+            else -> null
+        }
+        return Validacion(yaSeHaEjecutado || noEsEnEstaRonda || (!hayEvento && !hayQueSeleccionarEventoNuevo), mensaje)
     }
+
+    fun hayQueSeleccionarEventoNuevo(hayEvento: Boolean): Boolean = false
 
     class Factory {
 
@@ -122,7 +138,7 @@ interface GestorRonda {
                 Ronda.TARDE -> GestorRondaTarde(mostrarMensaje)
                 Ronda.NOCHE -> GestorRondaNoche(mostrarMensaje)
                 Ronda.MANANA -> null // TODO Melero: 10/7/25 Por hacer
-                Ronda.NO_VALIDO -> null
+                Ronda.NO_VALIDA -> null
             }
         }
     }

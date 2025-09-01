@@ -66,14 +66,14 @@ class NavegadorRondas(val navController: NavController) {
             Partida.Ronda.MEDIODIA -> Partida.Ronda.TARDE
             Partida.Ronda.TARDE -> Partida.Ronda.NOCHE
             Partida.Ronda.NOCHE -> Partida.Ronda.MANANA
-            Partida.Ronda.NO_VALIDO -> Partida.Ronda.NO_VALIDO
+            Partida.Ronda.NO_VALIDA -> Partida.Ronda.NO_VALIDA
         }
 
         fun obtenerDestinoDeRondaActual(ronda: Partida.Ronda): PantallaRonda? = when(ronda) {
             Partida.Ronda.MANANA -> Destinos.Manana
             Partida.Ronda.MEDIODIA, Partida.Ronda.TARDE -> Destinos.MediodiaTarde
             Partida.Ronda.NOCHE -> Destinos.Noche
-            Partida.Ronda.NO_VALIDO -> null
+            Partida.Ronda.NO_VALIDA -> null
         }
     }
 
@@ -83,7 +83,7 @@ class NavegadorRondas(val navController: NavController) {
             Partida.Ronda.MEDIODIA -> navegarAMediodia(partida)
             Partida.Ronda.TARDE -> navegarATarde(partida)
             Partida.Ronda.NOCHE -> navegarANoche(partida)
-            Partida.Ronda.NO_VALIDO -> { /* No se puede navegar a ningún lado si la partida no es válida. */
+            Partida.Ronda.NO_VALIDA -> { /* No se puede navegar a ningún lado si la partida no es válida. */
             }
         }
     }

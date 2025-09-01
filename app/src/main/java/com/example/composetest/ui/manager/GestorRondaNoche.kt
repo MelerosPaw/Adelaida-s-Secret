@@ -15,9 +15,9 @@ class GestorRondaNoche(
     override val mostrarMensaje: (mensaje: Mensaje) -> Unit
 ) : GestorRonda {
 
-    override fun getTabInicial(): TabData = TabData.EVENTOS
+    override val rondaActual: Partida.Ronda = Partida.Ronda.NOCHE
 
-    override fun seEjecutaAhora(evento: Evento): Boolean = evento.ronda == Partida.Ronda.NOCHE
+    override fun getTabInicial(): TabData = TabData.EVENTOS
 
     @StringRes
     override fun advertenciaAccionProhibida(posibleAccionProhibida: PosibleAccionProhibida): Int? =
@@ -28,21 +28,17 @@ class GestorRondaNoche(
         }
 
     override fun sePuedeCambiarDeRonda(partida: Partida): Boolean {
-        val sePuede = super.sePuedeCambiarDeRonda(partida)
-
-        return if (sePuede) {
-            val todosTienenBaremo = todosLosJugadoresTienenBaremo(partida.jugadores.toList())
-            val hayVisitasPendientes = this@GestorRondaNoche.hayVisitasPendientes()
-            mostrarMensajeSiNoEsValido(todosTienenBaremo, hayVisitasPendientes)
-            todosTienenBaremo.valido && !hayVisitasPendientes.valido
-        } else {
-            false
-        }
+        val validacionesComunes = validacionesComunes(partida)
+        val todosTienenBaremo = todosLosJugadoresTienenBaremo(partida.jugadores.toList())
+        val visitasPendientes = hayVisitasPendientes()
+        val validacionesTotales = validacionesComunes + todosTienenBaremo + visitasPendientes
+        mostrarMensajeSiNoEsValido(*validacionesTotales.toTypedArray())
+        return validacionesTotales.all { it.valido }
     }
 
-    override fun esOtraRonda(ronda: Partida.Ronda): Boolean = ronda != Partida.Ronda.NOCHE
+    override fun hayQueSeleccionarEventoNuevo(hayEvento: Boolean): Boolean = !hayEvento
 
-    // TODO Melero: 5/3/25
+    // TODO Melero: 5/3/25 Comprobar las visitas
     private fun hayVisitasPendientes(): Validacion = Validacion(false, "Quedan las visitas")
 
     private fun todosLosJugadoresTienenBaremo(jugadores: List<Jugador>): Validacion {

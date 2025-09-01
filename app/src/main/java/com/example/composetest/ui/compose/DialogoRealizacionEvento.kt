@@ -19,9 +19,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.example.composetest.R
 import com.example.composetest.extensions.joinToStringHumanReadable
 import com.example.composetest.model.Evento
 import com.example.composetest.ui.compose.navegacion.Mensaje
@@ -104,11 +106,11 @@ private fun SeleccionJugadoresAfectados(
 ) {
   Column {
     val cantidadGanadores = evento.evento.maxGanadores.obtenerCantidadGanadores()
+    val jugadoresMaximos = cantidadGanadores.coerceAtMost(evento.jugadores.size)
     val encabezadoPregunta = "Qué jugadores han sacado"
-      .takeIf { cantidadGanadores > 1 }
+      .takeIf { jugadoresMaximos > 1 }
       ?: "Qué jugador ha sacado"
     val puntuaciones = evento.evento.puntuaciones
-    val jugadoresMaximos = cantidadGanadores.coerceAtMost(evento.jugadores.size)
     val pregunta = "¿$encabezadoPregunta $puntuaciones? (Máximo: $jugadoresMaximos)"
 
     Encabezado("Jugadores afectados", colorTexto)
@@ -116,7 +118,9 @@ private fun SeleccionJugadoresAfectados(
     FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
       evento.jugadores.forEach { vo ->
         Row(
-          modifier = Modifier.padding(top = MargenEstandar).padding(horizontal = 8.dp),
+          modifier = Modifier
+            .padding(top = MargenEstandar)
+            .padding(horizontal = 8.dp),
           verticalAlignment = Alignment.CenterVertically,
         ) {
           val habilitado = vo.seleccionado || evento.puedeSeleccionarMasJugadores
@@ -165,8 +169,8 @@ private fun BotonesDialogoRealizacion(
 ) {
   val esLaUltimaPagina = currentPage == 2
   val esLaPrimeraPagina = currentPage == 0
-  val textoBotonSiguiente = "FIN DEL EVENTO".takeIf { esLaUltimaPagina }
-  val textoBotonAnterior = "CANCELAR".takeIf { esLaPrimeraPagina }
+  val textoBotonSiguiente = stringResource(R.string.fin_del_evento).takeIf { esLaUltimaPagina }
+  val textoBotonAnterior = stringResource(R.string.cancelar_realizacion_evento).takeIf { esLaPrimeraPagina }
   val clicSiguiente = { consumidor.consumir(Intencion.DarEventoPorRealizado(evento)) }
     .takeIf { esLaUltimaPagina }
   val clicAnterior = { consumidor.consumir(Intencion.CerrarRealizacionEvento(evento)) }

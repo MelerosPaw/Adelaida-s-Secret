@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.toRoute
 import com.example.composetest.data.uc.ActualizarNombrePartidaUC
-import com.example.composetest.data.uc.ActualizarRondaUC
+import com.example.composetest.data.uc.PasarSiguienteRondaUC
 import com.example.composetest.data.uc.ObtenerPartidaFlowUC
 import com.example.composetest.extensions.noneNull
 import com.example.composetest.model.ElementoTablero
@@ -42,7 +42,7 @@ class PartidaViewModel @Inject constructor(
     @Inject
     lateinit var obtenerPartidaFlowUC: Provider<ObtenerPartidaFlowUC>
     @Inject
-    lateinit var actualizarRondaUC: Provider<ActualizarRondaUC>
+    lateinit var actualizarRondaUC: Provider<PasarSiguienteRondaUC>
 
     // region Estados
     var estado: EstadoPartida = EstadoPartida()
@@ -169,7 +169,7 @@ class PartidaViewModel @Inject constructor(
     fun onRondaSiguiente() {
         estado.partida.value.partida?.let {
             suspender {
-                val params = ActualizarRondaUC.Parametros(it)
+                val params = PasarSiguienteRondaUC.Parametros(it)
                 actualizarRondaUC.get()
                     .invoke(params)
                     .usarRespuesta { navegarASiguienteRonda(it) }

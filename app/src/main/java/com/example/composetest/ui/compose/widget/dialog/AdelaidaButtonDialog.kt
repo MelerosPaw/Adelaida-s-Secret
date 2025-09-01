@@ -25,7 +25,7 @@ import com.example.composetest.ui.compose.ElementoMano
 import com.example.composetest.ui.compose.screen.ScreenPreviewMarron
 import com.example.composetest.ui.compose.theme.MargenEstandar
 import com.example.composetest.ui.compose.theme.Tema
-import com.example.composetest.ui.compose.theme.TextoClaro
+import com.example.composetest.ui.compose.theme.ContenidoClaro
 import com.example.composetest.ui.compose.theme.displayFontFamily
 import com.example.composetest.ui.compose.widget.AdelaidaText
 
@@ -47,7 +47,7 @@ fun <T> AdelaidaButtonDialog(
                 ElementoMano(
                     elementoTablero,
                     conPadding = false,
-                    colorTexto = TextoClaro,
+                    colorTexto = ContenidoClaro,
                     decorativo = true,
                 )
             }

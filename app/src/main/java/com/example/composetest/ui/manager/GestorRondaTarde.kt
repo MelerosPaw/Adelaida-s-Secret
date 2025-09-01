@@ -9,15 +9,13 @@ import com.example.composetest.ui.compose.PosibleAccionProhibida
 import com.example.composetest.ui.compose.TabData
 import com.example.composetest.ui.compose.navegacion.Mensaje
 
-private val miRonda = Partida.Ronda.TARDE
-
 class GestorRondaTarde(
     override val mostrarMensaje: (mensaje: Mensaje) -> Unit
 ): GestorRonda {
 
-    override fun getTabInicial(): TabData = TabData.JUGADORES
+    override val rondaActual: Partida.Ronda = Partida.Ronda.TARDE
 
-    override fun seEjecutaAhora(evento: Evento): Boolean = evento.ronda == miRonda
+    override fun getTabInicial(): TabData = TabData.JUGADORES
 
     @StringRes
     override fun advertenciaAccionProhibida(posibleAccionProhibida: PosibleAccionProhibida): Int? =
@@ -40,6 +38,4 @@ class GestorRondaTarde(
         is ElementoTablero.Carta -> R.string.advertencia_reasignacion_carta_tarde
         is ElementoTablero.Pista -> R.string.advertencia_reasignacion_pista_tarde
     }
-
-    override fun esOtraRonda(ronda: Partida.Ronda): Boolean = ronda != miRonda
 }

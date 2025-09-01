@@ -240,10 +240,8 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
     estados.set(ConfirmarEjecutarEvento(evento))
   }
 
-  private fun sePuedenSeleccionarMasGanadores(
-    jugadores: List<JugadorVO>,
-    evento: Evento
-  ): Boolean = jugadores.count { it.seleccionado } < evento.maxGanadores.obtenerCantidadGanadores()
+  private fun sePuedenSeleccionarMasGanadores(jugadores: List<JugadorVO>, evento: Evento): Boolean =
+    jugadores.count { it.seleccionado } < evento.maxGanadores.obtenerCantidadGanadores()
 
   private fun afterEventoSeleccionado(
     evento: EventoVO,

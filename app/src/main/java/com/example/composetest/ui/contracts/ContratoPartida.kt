@@ -80,7 +80,7 @@ class EstadoPartida {
               preguntaSiguienteRonda = gestorRonda.getPreguntaSiguienteRonda(this),
               explicacionVisible = false,
               subtitulo = gestorRonda.getSubtitulo(this),
-              explicacion = gestorRonda.getExplicacion(this),
+              explicacion = gestorRonda.getExplicacion(this, partida.dia),
               explicacionEsHTMTL = gestorRonda.getExplicacionEsHtml(this),
               mostrarTituloSiguienteRonda = true,
             )

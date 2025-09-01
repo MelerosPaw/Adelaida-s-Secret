@@ -16,6 +16,7 @@ import com.example.composetest.data.db.dbo.ElementoCartaDBO
 import com.example.composetest.data.db.dbo.JugadorDBO
 import com.example.composetest.data.db.dbo.PartidaDBO
 import com.example.composetest.data.db.exception.BaseDatosException
+import com.example.composetest.data.db.reduced.PartidaConRonda
 import com.example.composetest.data.db.reduced.PartidaYAsesino
 import com.example.composetest.data.db.reduced.SoloNombrePartida
 import com.example.composetest.data.db.relations.PartidaCompleta
@@ -65,6 +66,9 @@ interface PartidaDAO {
     @Transaction
     @Query("SELECT * FROM PartidaDBO WHERE PartidaDBO.id = :idPartida LIMIT 1")
     suspend fun obtenerPartida(idPartida: Long): PartidaCompleta?
+
+    @Update(entity = PartidaDBO::class)
+    suspend fun actualizarRondaPartida(partida: PartidaConRonda): Int
 
     @Transaction
     suspend fun obtenerPartidaOThrow(idPartida: Long): PartidaCompleta {

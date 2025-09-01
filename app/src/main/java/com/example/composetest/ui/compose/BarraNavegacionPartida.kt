@@ -89,7 +89,7 @@ enum class TabData(val nombre: String, val posicion: Int, val toDraw: ToDraw) {
       Partida.Ronda.MEDIODIA -> TABLERO
       Partida.Ronda.TARDE -> JUGADORES
       Partida.Ronda.NOCHE -> EVENTOS
-      Partida.Ronda.NO_VALIDO -> INFO
+      Partida.Ronda.NO_VALIDA -> INFO
     }
   }
 }

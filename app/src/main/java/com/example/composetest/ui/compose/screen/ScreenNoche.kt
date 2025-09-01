@@ -18,11 +18,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.composetest.R
 import com.example.composetest.model.Baremo
 import com.example.composetest.model.Jugador
 import com.example.composetest.model.Partida
@@ -219,18 +221,26 @@ private fun TituloEventoYBotones(
         TituloEvento(
             eventoSeleccionado?.evento?.nombre,
             Tema.colors.texto,
-            Modifier.then(dimensiones).padding(end = margenFin),
+            Modifier
+                .then(dimensiones)
+                .padding(end = margenFin),
             TextAlign.Center.takeIf { !esLandscape } ?: TextAlign.Start
         )
         FlowRow(horizontalArrangement = Arrangement.End.takeIf { isLandscape() } ?: Arrangement.Center) {
             val medidaBoton = Modifier.fillMaxWidth().takeUnless { esLandscape } ?: Modifier.wrapContentWidth()
 
             if (!yaSeHaRealizado) {
-                AdelaidaButton(seleccionEventoAleatorio, "ALEATORIO", Modifier.padding(end = margenFin).then(medidaBoton))
-                AdelaidaButton(seleccionManual, "SELECCIÓN MANUAL", medidaBoton)
+                AdelaidaButton(seleccionEventoAleatorio,
+                    stringResource(R.string.aleatorio), Modifier
+                        .padding(end = margenFin)
+                        .then(medidaBoton))
+                AdelaidaButton(seleccionManual, stringResource(R.string.seleccion_manual), medidaBoton)
 
                 if (eventoSeleccionado?.sePuedeEjecutarAhora == true) {
-                    AdelaidaButton(realizarEvento, "REALIZAR", Modifier.padding(end = margenFin).then(medidaBoton))
+                    AdelaidaButton(realizarEvento,
+                        stringResource(R.string.realizar_evento), Modifier
+                            .padding(end = margenFin)
+                            .then(medidaBoton))
                 }
             }
         }

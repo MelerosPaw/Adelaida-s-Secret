@@ -70,10 +70,10 @@ val DecoradoBotonVerdeClaro = Color(0xFF2F412B)
 // endregion
 
 // region Texto
-val TextoOscuro = Color(0xFFDBDBDB)
-val TextoClaro = Color(0xFF392623)
-val TextoVerdeOscuro = Color(0xFFDBDBDB)
-val TextoVerdeClaro = Color(0xFF161D14)
+val ContenidoOscuro = Color(0xFFDBDBDB)
+val ContenidoClaro = Color(0xFF392623)
+val ContenidoVerdeOscuro = Color(0xFFDBDBDB)
+val ContenidoVerdeClaro = Color(0xFFDBDBDB)
 val TextoInhabilitadoClaro = Color(0xFF555555)
 val TextoInhabilitadoOscuro = Color(0xFF555555)
 val TextoInhabilitadoVerdeClaro = Color(0xFF555555)
@@ -81,10 +81,10 @@ val TextoInhabilitadoVerdeOscuro = Color(0xFF555555)
 // endregion
 
 // region Iconos
-val IconosClaro = TextoClaro
-val IconosOscuro = TextoOscuro
-val IconosVerdeClaro = TextoVerdeClaro
-val IconosVerdeOscuro = TextoVerdeOscuro
+val IconosClaro = ContenidoClaro
+val IconosOscuro = ContenidoOscuro
+val IconosVerdeClaro = ContenidoVerdeClaro
+val IconosVerdeOscuro = ContenidoVerdeOscuro
 // endergion
 
 //region Checkbox
@@ -92,14 +92,14 @@ val CheckboxMarcadoClaro = Color(0x88342020)
 val CheckboxMarcadoOscuro = Color(0x88342020)
 val CheckboxMarcadoVerdeClaro = Color(0x88293420)
 val CheckboxMarcadoVerdeOscuro = Color(0x88293420)
-val CheckboxMarcaClaro = TextoOscuro
-val CheckboxMarcaOscuro = TextoOscuro
-val CheckboxMarcaVerdeClaro = TextoClaro
-val CheckboxMarcaVerdeOscuro = TextoVerdeOscuro
-val CheckboxDesmarcadoClaro = TextoClaro
-val CheckboxDesmarcadoOscuro = TextoOscuro
-val CheckboxDesmarcadoVerdeClaro = TextoVerdeClaro
-val CheckboxDesmarcadoVerdeOscuro = TextoVerdeOscuro
+val CheckboxMarcaClaro = ContenidoOscuro
+val CheckboxMarcaOscuro = ContenidoOscuro
+val CheckboxMarcaVerdeClaro = ContenidoClaro
+val CheckboxMarcaVerdeOscuro = ContenidoVerdeOscuro
+val CheckboxDesmarcadoClaro = ContenidoClaro
+val CheckboxDesmarcadoOscuro = ContenidoOscuro
+val CheckboxDesmarcadoVerdeClaro = ContenidoVerdeClaro
+val CheckboxDesmarcadoVerdeOscuro = ContenidoVerdeOscuro
 //endregion
 
 // region Dialogs
@@ -121,8 +121,10 @@ val FondoPantallaCargando = Color(0x995D4B4B)
 val TextoNormal = Color.White
 val TextoDialogOutlinedTextFieldUnfocused = Color(0x995D4B4B)
 val TextoDialogOutlinedTextField = Color.White
-val DivisorHorizontalClaro = Color(0xD5DCC89A)
-val DivisorHorizontalOscuro = Color(0x33DCC89A)
+val DivisorHorizontalClaro = ContenidoClaro
+val DivisorHorizontalOscuro = ContenidoOscuro
+val DivisorHorizontalVerdeClaro = ContenidoVerdeClaro
+val DivisorHorizontalVerdeOscuro = ContenidoVerdeOscuro
 val Hueco = Color(0xFF403232)
 val ContenedorCartas = Color(0xFF675454)
 val FondoBaremoSeleccionado = Primario
@@ -130,9 +132,9 @@ val FondoBaremoSinSeleccionar = Color.White
 val TextoBaremoSeleccionado = Color.White
 val TextoBaremoSinSeleccionar = Primario
 val ResalteOscuro = Color(0xFFDFB47A)
-val ResalteClaro = Color(0xFFDFC7A6)
+val ResalteClaro = Color(0xFF6B4201)
 val ResalteVerdeOscuro = Color(0xFFC1CB91)
-val ResalteVerdeClaro = Color(0xFFBBC781)
+val ResalteVerdeClaro = Color(0xFF839D05)
 // endregion
 
 val ToolbarClaro = Color(0xFF634C4C)

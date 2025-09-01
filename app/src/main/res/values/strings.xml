@@ -18,8 +18,9 @@
   <string name="alias_ronda_tarde">Ronda de asuntos turbios</string>
   <string name="explicacion_manana">Reune a los investigadores para desayunar. Si hay un evento (cosa que tendrá que salir en algún lado), haz el evento. Aumenta el contador de Fuerza de la defensa y luego pide a cada jugador que seleccione la habitación en la que van a investigar.</string>
   <string name="explicacion_mediodia">Cada investigador se moverá a la casilla de la habitación seleccionada que quieran investigar. Asígnale el contenido de dicha casilla si todavía no se lo ha llevado nadie. Una vez todos los jugadores se hayan movido, asegúrate de que todos tienen como máximo 3 pistas en sus vitrinas y después mándalos a sus cuartos para que las lean tranquilamente. Aquellos que estén en la misma habitación deben irse juntos al mismo cuarto.</string>
-  <string name="explicacion_tarde"><![CDATA[<p>Si hay un evento, realízalo antes de empezar. A continuación, visita por turnos a los jugadores que tengan el dinero suficiente para contratar sicarios, o un brandy para emborrachar a otro investigador. Solo pueden realizar un asunto turbio sobre cada jugador.</p>Cuando todos hayan realizado los asuntos turbios que quiran y terminen de estudiar sus pistas, pasa a la siguiente ronda.]]></string>
-  <string name="explicacion_primera_noche">Llama a los jugadores a la mesa para cenar. El primer día, entrega a cada uno un baremo de fuerza de la acusación. Si es otro día, ofrece la posibilidad de cambiar su baremo, dándole tres a elegir aleatoriamente. Luego destapa un evento. Si tiene lugar esta noche, realízalo ahora. Por último, envía a todo el mundo a la cama. Si alguno de los investigadores acaba de obtener una pista nueva, Adelaida debe hacerle una visita.</string>
+  <string name="explicacion_tarde"><![CDATA[<p>Si hay un evento, realízalo antes de empezar. A continuación, visita por turnos a los jugadores que tengan el dinero suficiente para contratar sicarios, o un brandy para emborrachar a otro investigador. Solo pueden realizar un asunto turbio sobre cada jugador.</p>Cuando todos hayan realizado los asuntos turbios que quieran y terminen de estudiar sus pistas, pasa a la siguiente ronda.]]></string>
+  <string name="explicacion_primera_noche">Llama a los jugadores a la mesa para cenar. Entrega a cada uno un baremo de fuerza de la acusación. Luego destapa un evento. Si tiene lugar esta noche, realízalo ahora. Por último, envía a todo el mundo a la cama. Si alguno de los investigadores acaba de obtener una pista nueva, Adelaida debe hacerle una visita.</string>
+  <string name="explicacion_demas_noches">Llama a los jugadores a la mesa para cenar. Ofrece a los jugadores la posibilidad de cambiar su baremo por otro, dándoles tres a elegir aleatoriamente. Luego destapa un evento. Si tiene lugar esta noche, realízalo ahora. Por último, envía a todo el mundo a la cama. Si alguno de los investigadores acaba de obtener una pista nueva, Adelaida debe hacerle una visita.</string>
   <string name="explicacion_resto_de_noches">Explicación resto de noches</string>
   <string name="no_valido">Esto jamás debería verse</string>
   <string name="pregunta_fin_manana">¿Quieres dar por finalizada la mañana?</string>
@@ -41,7 +42,13 @@
   <!-- endregion -->
 
   <!-- region Seccion eventos -->
-  <string name= "sin_evento_seleccionado">Sin evento aún</string>
+  <string name="sin_evento_seleccionado">Sin evento aún</string>
+  <string name="selecciona_un_evento">Selecciona un evento</string>
+  <string name="fin_del_evento">FIN DEL EVENTO</string>
+  <string name="cancelar_realizacion_evento">CANCELAR</string>
+  <string name="realizar_evento">REALIZAR</string>
+  <string name="seleccion_manual">SELECCIÓN MANUAL</string>
+  <string name="aleatorio">ALEATORIO</string>
 
 
 </resources>

@@ -543,7 +543,7 @@ private fun ScreenPartidaPreview() {
         false, gestorRonda!!.getPreguntaSiguienteRonda(partida.ronda),
         false,
         gestorRonda.getSubtitulo(partida.ronda),
-        gestorRonda.getExplicacion(partida.ronda),
+        gestorRonda.getExplicacion(partida.ronda, partida.dia),
         gestorRonda.getExplicacionEsHtml(partida.ronda),
         true,
     )

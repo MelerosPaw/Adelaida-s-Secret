@@ -53,15 +53,15 @@ enum class Resultados(val placehoder: String, val fraseFija: String, val puntuac
     val indiceFraseEscogida = Random.nextInt(0, puntuaciones.size)
     val puntuacionEscogida = puntuaciones[indiceFraseEscogida]
     val fraseEscogidaFormateada = puntuacionEscogida.replacePlaceholdersWithDieResults(placeholderNumero)
-    return PuntuacionFormateada(texto.replace(placehoder, "$fraseFija $fraseEscogidaFormateada"), puntuacionEscogida)
+    return PuntuacionFormateada(texto.replace(placehoder, "$fraseFija $fraseEscogidaFormateada"), fraseEscogidaFormateada)
   }
 }
 
-class PuntuacionFormateada(val explicacionFormateada:String, val puntuaciones: String)
+class PuntuacionFormateada(val explicacionFormateada: String, val puntuaciones: String)
 
 private fun String.replacePlaceholdersWithDieResults(placeholder: String): String {
   val occurrences = countOccurrencesOf(placeholder)
-  val dieResults = getDistincDieResults(occurrences)
+  val dieResults = getDistincDieRolls(occurrences)
   return replaceOccurrencesWithDieResult(occurrences, dieResults, placeholder)
 }
 
@@ -79,12 +79,19 @@ private fun String.replaceOccurrencesWithDieResult(
   return stringWithReplacements
 }
 
-private fun getDistincDieResults(occurrences: Int): List<String> {
-  val numbers = Array(6) {
-    it.inc().toString()
-  }.toList().shuffled().take(occurrences)
-  return numbers
-}
+/**
+ * Devuelve [occurrences] números entre el 1 y el 6.
+ *
+ * @param occurrences Si se pasa más de 6, se devolverán igualmente 6. Un dado no puede producir
+ * más de 6 resultados distintos.
+ */
+fun getDistincDieRolls(occurrences: Int): List<String> = Array(6) {
+  it.inc().toString()
+}.toList()
+  .shuffled()
+  .take(occurrences)
+  .sorted()
+
 
 private fun String.countOccurrencesOf(token: String): Int {
   var startIndex = 0

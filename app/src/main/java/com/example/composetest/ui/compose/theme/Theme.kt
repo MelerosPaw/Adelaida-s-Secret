@@ -32,9 +32,9 @@ fun AdelaidaTheme(content: @Composable () -> Unit) {
     statusBar = BarraEstado,
     toolbarContainer = claroOscuro(isDarkTheme, ToolbarClaro, ToolbarOscuro),
     toolbarContent = Color.White,
-    tituloInicioRonda = claroOscuro(isDarkTheme, TextoClaro, TextoOscuro),
+    tituloInicioRonda = claroOscuro(isDarkTheme, ContenidoClaro, ContenidoOscuro),
     subtituloInicioRonda = claroOscuro(isDarkTheme, TextoInhabilitadoClaro, TextoInhabilitadoOscuro),
-    texto = claroOscuro(isDarkTheme, TextoClaro, TextoOscuro),
+    texto = claroOscuro(isDarkTheme, ContenidoClaro, ContenidoOscuro),
     rellenoBoton = claroOscuro(isDarkTheme, RellenoBotonClaro, RellenoBotonOscuro),
     rellenoBotonPulsado = claroOscuro(isDarkTheme, RellenoBotonPulsadoClaro, RellenoBotonPulsadoOscuro),
     contenidoBoton = claroOscuro(isDarkTheme, TextoBotonClaro, TextoBotonOscuro),
@@ -71,8 +71,8 @@ fun AdelaidaThemeVerde(content: @Composable () -> Unit) {
     statusBar = BarraEstadoVerde,
     toolbarContainer = claroOscuro(isDarkTheme, ToolbarVerdeClaro, ToolbarVerdeOscuro),
     toolbarContent = Color.White,
-    texto = claroOscuro(isDarkTheme, TextoVerdeClaro, TextoVerdeOscuro),
-    tituloInicioRonda = claroOscuro(isDarkTheme, TextoClaro, TextoOscuro),
+    texto = claroOscuro(isDarkTheme, ContenidoVerdeClaro, ContenidoVerdeOscuro),
+    tituloInicioRonda = claroOscuro(isDarkTheme, ContenidoClaro, ContenidoOscuro),
     subtituloInicioRonda = claroOscuro(isDarkTheme, TextoInhabilitadoVerdeClaro, TextoInhabilitadoVerdeOscuro),
     rellenoBoton = claroOscuro(isDarkTheme, RellenoBotonVerdeClaro, RellenoBotonVerdeOscuro),
     rellenoBotonPulsado = claroOscuro(isDarkTheme, RellenoBotonPulsadoVerdeClaro, RellenoBotonPulsadoVerdeOscuro),
@@ -96,7 +96,7 @@ fun AdelaidaThemeVerde(content: @Composable () -> Unit) {
     fondoCheckboxDesmarcado = claroOscuro(isDarkTheme, CheckboxDesmarcadoVerdeClaro, CheckboxDesmarcadoVerdeOscuro),
     fondoCheckboxInhabilitado = claroOscuro(isDarkTheme, TextoBotonInhabilitadoVerdeClaro, TextoBotonInhabilitadoVerdeOscuro),
     marcaCheckbox = claroOscuro(isDarkTheme, CheckboxMarcaVerdeClaro, CheckboxMarcaVerdeOscuro),
-    divisor = claroOscuro(isDarkTheme, DivisorHorizontalClaro, DivisorHorizontalOscuro),
+    divisor = claroOscuro(isDarkTheme, DivisorHorizontalVerdeClaro, DivisorHorizontalVerdeOscuro),
   )
   BaseTheme(useDarkTheme = isDarkTheme, extendedColors = extendedColors, content = content)
 }

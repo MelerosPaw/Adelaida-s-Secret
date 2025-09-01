@@ -29,7 +29,7 @@ fun DialogoCompra(
 @Composable
 private fun DineroInsuficiente(comprador: Jugador, cerrarDialogo: () -> Unit) {
     AdelaidaButtonDialog(
-        "No tienes dinero suficiente para comprar nada.",
+        "${comprador.nombre} no tiene dinero suficiente para comprar nada.",
         arrayOf(OpcionDialogo("¡Total! ¡Tampoco quería nada!", null) { cerrarDialogo() }),
         ElementoTablero.Carta.Dinero(1, comprador.dinero)
     )

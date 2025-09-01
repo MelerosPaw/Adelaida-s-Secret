@@ -98,9 +98,6 @@ interface TableroDAO {
     @Update(entity = PartidaDBO::class)
     suspend fun actualizarEstadoPartida(partida: PartidaConEstado): Int
 
-    @Update(entity = PartidaDBO::class)
-    suspend fun actualizarRondaPartida(partida: PartidaConRonda): Int
-
     @Transaction
     @Query("SELECT * FROM TableroDBO WHERE TableroDBO.id = :idPartida")
     suspend fun obtenerTablero(idPartida: Long): TableroCompleto?

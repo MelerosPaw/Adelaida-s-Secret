@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -111,7 +112,7 @@ fun ListadoEventos(
 @Composable
 private fun TituloVentana(onCerrarListado: () -> Unit) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Titulo("Selecciona un evento", Modifier.weight(1f), NivelTitulo.Nivel2, TextAlign.Center)
+        Titulo(stringResource(R.string.selecciona_un_evento), Modifier.weight(1f), NivelTitulo.Nivel2, TextAlign.Center)
         Equis(onCerrarListado, "Cerrar")
     }
 }

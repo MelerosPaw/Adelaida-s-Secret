@@ -35,11 +35,11 @@ data class Partida(
             ?.let { "\nJugadores: ${it.joinToStringHumanReadable { it.nombre }}" }
             .orEmpty()
 
-        return "$fecha - $nombreRonda$jugadores"
+        return "$fecha\n$nombreRonda$jugadores"
     }
 
     enum class EstadoCreacion(val id: String) {
-        SELECCION_ASESINO("Seleccion de sospechoso"),
+        SELECCION_ASESINO("Selección de sospechoso"),
         SELECCION_TABLERO("Creación de tablero"),
         SELECCION_JUGADORES("Listado de jugadores"),
         PARTIDA_EMPEZADA("Jugando"),
@@ -57,12 +57,12 @@ data class Partida(
         MEDIODIA("Mediodía"),
         TARDE("Tarde"),
         NOCHE("Noche"),
-        NO_VALIDO("No valido");
+        NO_VALIDA("No valido");
 
         companion object {
 
             fun byId(id: String): Ronda =
-                Ronda.entries.firstOrNull { it.id == id } ?: NO_VALIDO
+                Ronda.entries.firstOrNull { it.id == id } ?: NO_VALIDA
         }
     }
 }
