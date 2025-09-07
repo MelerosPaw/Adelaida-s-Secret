@@ -11,7 +11,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -58,9 +58,7 @@ private fun ScreenMain(
     Image(
       painterResource(R.drawable.fondo),
       null,
-      Modifier
-        .fillMaxWidth()
-        .fillMaxHeight(),
+      Modifier.fillMaxSize(),
       contentScale = ContentScale.Crop
     )
 

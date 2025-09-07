@@ -30,7 +30,7 @@ class GestorRondaNoche(
     override fun sePuedeCambiarDeRonda(partida: Partida): Boolean {
         val validacionesComunes = validacionesComunes(partida)
         val todosTienenBaremo = todosLosJugadoresTienenBaremo(partida.jugadores.toList())
-        val visitasPendientes = hayVisitasPendientes()
+        val visitasPendientes = hayVisitasPendientes(partida)
         val validacionesTotales = validacionesComunes + todosTienenBaremo + visitasPendientes
         mostrarMensajeSiNoEsValido(*validacionesTotales.toTypedArray())
         return validacionesTotales.all { it.valido }
@@ -38,8 +38,19 @@ class GestorRondaNoche(
 
     override fun hayQueSeleccionarEventoNuevo(hayEvento: Boolean): Boolean = !hayEvento
 
-    // TODO Melero: 5/3/25 Comprobar las visitas
-    private fun hayVisitasPendientes(): Validacion = Validacion(false, "Quedan las visitas")
+    private fun hayVisitasPendientes(partida: Partida): Validacion {
+        val jugadoresConSecretosPendientes = partida.jugadores.filter { jugador ->
+            jugador.idsSecretosReveladosRonda.any {
+                it !in jugador.idsSecretosRevelados
+            }
+        }
+
+        return if (jugadoresConSecretosPendientes.isEmpty()) {
+            Validacion(true, null)
+        } else {
+            Validacion(false, "Adelaida debe visitar a ${jugadoresConSecretosPendientes.joinToStringHumanReadable { it.nombre }}")
+        }
+    }
 
     private fun todosLosJugadoresTienenBaremo(jugadores: List<Jugador>): Validacion {
         val jugadoresSinBaremos = jugadores

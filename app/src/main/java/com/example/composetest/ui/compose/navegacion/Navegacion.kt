@@ -1,6 +1,8 @@
 package com.example.composetest.ui.compose.navegacion
 
 import android.app.Activity
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -252,9 +254,11 @@ class NavegadorCreacion(val navController: NavController) {
             fun nombrePartida(
                 nombrePartida: String?,
                 actualizarNombrePartida: (String) -> Unit,
-                enabled: Boolean
+                enabled: Boolean,
+                onClicked: (() -> Unit) = {},
             ): @Composable () -> Unit = {
-                NombrePartida(nombrePartida, actualizarNombrePartida, Modifier.padding(end = 8.dp),
+                NombrePartida(nombrePartida, actualizarNombrePartida,
+                    Modifier.padding(end = 8.dp).clickable { onClicked() },
                     enabled = enabled, tint = Tema.colors.toolbarContent)
             }
         }

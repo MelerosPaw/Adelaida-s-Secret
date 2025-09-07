@@ -23,11 +23,12 @@ import com.example.composetest.data.db.exception.ComprarException.DineroNegativo
 import com.example.composetest.data.db.reduced.ActualizacionJugador
 import com.example.composetest.data.db.reduced.AsignacionElemento
 import com.example.composetest.data.db.reduced.CartaGastada
-import com.example.composetest.data.mapper.fromdbo.getIdsSecretosConocidosRondaAsStringList
+import com.example.composetest.data.mapper.fromdbo.eliminarSecreto
 import com.example.composetest.data.mapper.fromdbo.nuevoSecretoAdquirido
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Dao
 interface AsignarElementoDAO {
@@ -92,30 +93,34 @@ interface AsignarElementoDAO {
     jugador: JugadorDBO,
     idPartida: Long,
   ) {
-    borrarSecretoSiProcede(asignacion, idPartida)
-
     coroutineScope {
-      val jugadorDef = async { actualizarDineroYSecretosGuardados(jugador, idPartida, monedas, asignacion.idSecretoParaGuardar) }
-      val pistaDef = async { asignacion.copy(monedas = 0).also { actualizarUnaPista(it) } }
-      listOf(jugadorDef, pistaDef).awaitAll()
+     async { actualizarDineroYSecretosGuardados(jugador, monedas, asignacion.idSecretoParaGuardar) }
+     async { asignacion.copy(monedas = 0).also { actualizarUnaPista(it) } }
     }
   }
 
-  suspend fun borrarSecretoSiProcede(asignacion: AsignacionElemento, idPartida: Long) {
+  suspend fun asignarPistaSinDinero(actualizacion: AsignacionElemento, nuevoPoseedor: JugadorDBO) {
+    coroutineScope {
+      launch { actualizacion.idSecretoParaGuardar?.let { darSecretoAJugador(it, nuevoPoseedor) } }
+      launch { actualizarUnaPista(actualizacion) }
+    }
+  }
+
+  suspend fun AsignarElementoDAO.darSecretoAJugador(idSecretoNuevo: String, nuevoPoseedor: JugadorDBO) {
+    val jugadorActualizado = nuevoPoseedor.nuevoSecretoAdquirido(idSecretoNuevo)
+    actualizarJugador(jugadorActualizado)
+  }
+
+  suspend fun borrarSecretoSiProcede(asignacion: AsignacionElemento, idPartida: Long, idAnteriorPoseedor: Long) {
     if (asignacion.esDesasignacion && asignacion.idSecretoParaGuardar != null) {
-      val pista = obtenerSecreto(asignacion.idSecretoParaGuardar, idPartida)
-      val antiguoPoseedor = obtenerJugadorPorId(pista.idJugador)
+      val antiguoPoseedor = obtenerJugadorPorId(idAnteriorPoseedor)
 
       if (antiguoPoseedor != null) {
-        actualizarUnJugador(
-          antiguoPoseedor.copy(
-            idsSecretosConocidosRonda = antiguoPoseedor.getIdsSecretosConocidosRondaAsStringList()
-              ?.filter { it != asignacion.idSecretoParaGuardar }
-              ?.joinToString("|") { it })
-        )
+        actualizarUnJugador(antiguoPoseedor.eliminarSecreto(asignacion.idSecretoParaGuardar))
       }
-      // TODO Melero: 19/4/25 Quitarle el dinero, volvérselo a asignar a la pista.
-      //  No cuadra porque no se sabe si la pista que se está reasignando tenía valor o no.
+      // TODO Melero: 19/4/25 De momento hay forma de saber si la pista que se está reasignando
+      //  tenía valor o no. Podría ser reasignada justo después de haberla asignado erróneamente
+      //  o haber sido reasignada después de un robo, en cuyo caso, el dinero no procede cambiarlo.
     }
   }
 
@@ -146,7 +151,7 @@ interface AsignarElementoDAO {
     partida: Long
   ) {
     coroutineScope {
-      val jugadorDef = async { actualizarDineroYSecretosGuardados(jugador, partida, monedas, null) }
+      val jugadorDef = async { actualizarDineroYSecretosGuardados(jugador, monedas, null) }
       val guardadoDef = async { actualizarUnaCarta(asignacion) }
       listOf(jugadorDef, guardadoDef).awaitAll()
     }
@@ -180,19 +185,11 @@ interface AsignarElementoDAO {
 
   private suspend fun actualizarDineroYSecretosGuardados(
     jugador: JugadorDBO,
-    idPartida: Long,
     dinero: Int,
     idSecretoParaGuardar: String?
   ) {
-    val dineroSumado = jugador.dinero + dinero
-    val secretosConocidos = idSecretoParaGuardar
-      ?.let { jugador.nuevoSecretoAdquirido(it) }
-      ?: jugador.idsSecretosConocidosRonda
-
-    val jugadorActualizado = jugador.copy(
-      dinero = dineroSumado,
-      idsSecretosConocidosRonda = secretosConocidos
-    )
+    val dineroSumado = jugador.copy(dinero = jugador.dinero + dinero)
+    val jugadorActualizado = idSecretoParaGuardar?.let { dineroSumado.nuevoSecretoAdquirido(it) } ?: dineroSumado
 
     try {
       val actualizados = actualizarJugador(jugadorActualizado)

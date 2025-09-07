@@ -15,10 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composetest.R
 import com.example.composetest.model.Partida
+import com.example.composetest.ui.compose.screen.PreviewComponente
 import com.example.composetest.ui.compose.theme.Tema
 import com.example.composetest.ui.compose.widget.AdelaidaIcon
 import com.example.composetest.ui.compose.widget.AdelaidaText
@@ -63,6 +65,14 @@ private fun IconoTab(tabData: TabData, seleccionado: Boolean) {
   when (tabData.toDraw) {
     is ToDraw.Id -> AdelaidaIcon(painterResource(tabData.toDraw.id), null, modifier, tint)
     is ToDraw.Vector -> AdelaidaIcon(imageVector = tabData.toDraw.imageVector, null, modifier, tint)
+  }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+  PreviewComponente {
+    BarraNavegacionPartida(TabData.INFO, getTabs {  })
   }
 }
 

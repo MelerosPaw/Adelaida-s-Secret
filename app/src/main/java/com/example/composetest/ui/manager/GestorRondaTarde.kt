@@ -3,7 +3,6 @@ package com.example.composetest.ui.manager
 import androidx.annotation.StringRes
 import com.example.composetest.R
 import com.example.composetest.model.ElementoTablero
-import com.example.composetest.model.Evento
 import com.example.composetest.model.Partida
 import com.example.composetest.ui.compose.PosibleAccionProhibida
 import com.example.composetest.ui.compose.TabData

@@ -18,5 +18,5 @@ fun <T> List<T>.joinToStringHumanReadable(transform: (T) -> String): String =
     "${transform(elemento)}$alFinal"
   }
 
-fun <T> Array<T>.joinToStringHumanReadable(transform: (T) -> String): String =
+fun <T> Array<T>.joinToStringHumanReadable(transform: (T) -> String = { it.toString() }): String =
   toList().joinToStringHumanReadable(transform)

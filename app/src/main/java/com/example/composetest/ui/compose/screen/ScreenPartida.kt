@@ -46,6 +46,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.composetest.R
 import com.example.composetest.extensions.get
+import com.example.composetest.extensions.joinToStringHumanReadable
 import com.example.composetest.model.ElementoTablero
 import com.example.composetest.model.Jugador
 import com.example.composetest.model.Partida
@@ -129,6 +130,7 @@ fun ScreenPartida(
         viewModel.mostrarDialogoAbandonar,
         viewModel::onMostrarDialogoAbandonarCambiado,
         viewModel::abandonar,
+        onMensaje
     )
 }
 
@@ -157,6 +159,7 @@ private fun ScreenPartida(
     mostrarDialogoSalir: State<Boolean>,
     onMostrarMensajeAbandonar: (Boolean) -> Unit,
     onSalir: () -> Unit,
+    onMensaje: (Mensaje) -> Unit,
 ) {
     val partida by remember { estado.partida }
     val info by remember { estado.infoRonda }
@@ -164,27 +167,35 @@ private fun ScreenPartida(
     val asuntoTurbio by remember { estado.asuntoTurbio }
     val accionProhibida by remember { estado.infoAccionProhibida }
 
-    // Muestra un toast con los jugadores que tienen comodines y el evento actual
-//    partida?.let {
-//        val nombreEvento = it.eventoActual?.nombre ?: "Sin evento actual"
-//        val jugadoresConComodines: String = it.jugadores.mapNotNull { jugador ->
-//            val comodines = jugador.comodines.takeUnless { it.isEmpty() }
-//            val comodinesUnidos = comodines?.joinToStringHumanReadable { it.nombre }
-//            comodinesUnidos?.let { "${jugador.nombre } tiene $it" }
-//        }.takeIf { it.isNotEmpty() }
-//            ?.joinToStringHumanReadable { "$it\n" } ?: "Nadie tiene comodines"
-//        val mensaje = "Partida: $nombreEvento\n$jugadoresConComodines"
-//
-//        Toast.makeText(LocalContext.current, mensaje, Toast.LENGTH_SHORT).show()
-//    }
-
     Screen(
         configuracionToolbar = NavegadorCreacion.ConfiguracionToolbar(
             titulo = NavegadorCreacion.ConfiguracionToolbar.nombrePartida(
                 partida.partida?.nombre.orEmpty(),
                 actualizarNombrePartida,
                 asuntoTurbio.asuntoTurbio is Ninguno
-            ),
+            ) {
+                partida.partida?.let { laPartida ->
+                    val jugadoresConComodines: String = laPartida.jugadores.mapNotNull { jugador ->
+                        val comodines = jugador.comodines.takeUnless { it.isEmpty() }
+                        val comodinesUnidos = comodines?.joinToStringHumanReadable { it.nombre }
+                        comodinesUnidos?.let { "${jugador.nombre} tiene $it" }
+                    }
+                        .takeIf { it.isNotEmpty() }
+                        ?.joinToStringHumanReadable { "$it\n" } ?: "Nadie tiene comodines"
+
+                    val nombreEvento = laPartida.eventoActual?.nombre ?: "Sin evento actual"
+                    val infoEvento = "$nombreEvento\n$jugadoresConComodines"
+                    val secretosDeJugadores =
+                        laPartida.jugadores.joinToStringHumanReadable { jugador ->
+                            jugador.nombre + "\n" +
+                                "idsSecretosRevelados -> ${jugador.idsSecretosRevelados}\n" +
+                                "idsSecretosReveladosRonda -> ${jugador.idsSecretosReveladosRonda}"
+                        }
+                    val mensaje = secretosDeJugadores + "\n" + infoEvento
+
+                    onMensaje(Mensaje(mensaje))
+                }
+            },
             actions = {
                 Box {
                     AbrirFiltros(abrirFiltros)
@@ -574,6 +585,7 @@ private fun ScreenPartidaPreview() {
         mutableStateOf(false),
         {},
         {},
+        {}
     )
 }
 
