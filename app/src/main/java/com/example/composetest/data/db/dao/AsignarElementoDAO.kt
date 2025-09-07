@@ -94,14 +94,16 @@ interface AsignarElementoDAO {
     idPartida: Long,
   ) {
     coroutineScope {
-     async { actualizarDineroYSecretosGuardados(jugador, monedas, asignacion.idSecretoParaGuardar) }
-     async { asignacion.copy(monedas = 0).also { actualizarUnaPista(it) } }
+      // Paso null porque ya no se guarda cuando se asigna, sino cuando se va a producir la visita
+      launch { actualizarDineroYSecretosGuardados(jugador, monedas, null) }
+      launch { asignacion.copy(monedas = 0).also { actualizarUnaPista(it) } }
     }
   }
 
   suspend fun asignarPistaSinDinero(actualizacion: AsignacionElemento, nuevoPoseedor: JugadorDBO) {
     coroutineScope {
-      launch { actualizacion.idSecretoParaGuardar?.let { darSecretoAJugador(it, nuevoPoseedor) } }
+      // Comentado porque ya no se guarda el secreto cuando se asigna, sino cuando se va a producir la visita
+//      launch { actualizacion.idSecretoParaGuardar?.let { darSecretoAJugador(it, nuevoPoseedor) } }
       launch { actualizarUnaPista(actualizacion) }
     }
   }
@@ -151,9 +153,10 @@ interface AsignarElementoDAO {
     partida: Long
   ) {
     coroutineScope {
-      val jugadorDef = async { actualizarDineroYSecretosGuardados(jugador, monedas, null) }
-      val guardadoDef = async { actualizarUnaCarta(asignacion) }
-      listOf(jugadorDef, guardadoDef).awaitAll()
+      // Paso null porque dinero no es un secreto, pero aunque lo fuera, ya no se guarda cuando se
+      // asigna, sino cuando se va a producir la visita
+      async { actualizarDineroYSecretosGuardados(jugador, monedas, null) }
+      async { actualizarUnaCarta(asignacion) }
     }
   }
 

@@ -105,7 +105,9 @@ class AsignarElementoUC @Inject constructor(
           is RecogerDelTablero -> recogerPistaDelTablero(tipoAsignacion, actualizacion, idPartida)
           is DevolucionAlTablero -> actualizarUnaPista(actualizacion)
           is ReasignacionPorError -> {
-            borrarSecretoSiProcede(actualizacion, idPartida, tipoAsignacion.idAnteriorPoseedor)
+            // Comentado porque ya no se guarda el secreto cuando se asigna, sino cuando se va a
+            // producir la visita, por lo tanto, no procede quitarle el secreto a nadie de al reasignar
+//            borrarSecretoSiProcede(actualizacion, idPartida, tipoAsignacion.idAnteriorPoseedor)
             asignarPistaSinDinero(actualizacion, tipoAsignacion.nuevoPoseedor)
             actualizarUnaPista(actualizacion)
           }

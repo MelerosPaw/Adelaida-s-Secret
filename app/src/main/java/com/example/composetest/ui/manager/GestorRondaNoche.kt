@@ -3,9 +3,11 @@ package com.example.composetest.ui.manager
 import androidx.annotation.StringRes
 import com.example.composetest.R
 import com.example.composetest.extensions.joinToStringHumanReadable
+import com.example.composetest.model.ElementoTablero
 import com.example.composetest.model.Evento
 import com.example.composetest.model.Jugador
 import com.example.composetest.model.Partida
+import com.example.composetest.model.Secreto
 import com.example.composetest.ui.compose.PosibleAccionProhibida
 import com.example.composetest.ui.compose.TabData
 import com.example.composetest.ui.compose.navegacion.Mensaje
@@ -40,8 +42,8 @@ class GestorRondaNoche(
 
     private fun hayVisitasPendientes(partida: Partida): Validacion {
         val jugadoresConSecretosPendientes = partida.jugadores.filter { jugador ->
-            jugador.idsSecretosReveladosRonda.any {
-                it !in jugador.idsSecretosRevelados
+            jugador.pistas().any {
+                it is ElementoTablero.Pista.Secreto && it.id !in jugador.idsSecretosRevelados
             }
         }
 
