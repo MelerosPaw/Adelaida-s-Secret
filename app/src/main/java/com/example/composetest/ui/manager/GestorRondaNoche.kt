@@ -3,15 +3,11 @@ package com.example.composetest.ui.manager
 import androidx.annotation.StringRes
 import com.example.composetest.R
 import com.example.composetest.extensions.joinToStringHumanReadable
-import com.example.composetest.model.ElementoTablero
-import com.example.composetest.model.Evento
 import com.example.composetest.model.Jugador
 import com.example.composetest.model.Partida
-import com.example.composetest.model.Secreto
 import com.example.composetest.ui.compose.PosibleAccionProhibida
 import com.example.composetest.ui.compose.TabData
 import com.example.composetest.ui.compose.navegacion.Mensaje
-import com.example.composetest.ui.manager.GestorRonda.Validacion
 
 class GestorRondaNoche(
     override val mostrarMensaje: (mensaje: Mensaje) -> Unit
@@ -33,25 +29,20 @@ class GestorRondaNoche(
         val validacionesComunes = validacionesComunes(partida)
         val todosTienenBaremo = todosLosJugadoresTienenBaremo(partida.jugadores.toList())
         val visitasPendientes = hayVisitasPendientes(partida)
-        val validacionesTotales = validacionesComunes + todosTienenBaremo + visitasPendientes
-        mostrarMensajeSiNoEsValido(*validacionesTotales.toTypedArray())
-        return validacionesTotales.all { it.valido }
+        val validacionCompleta = (validacionesComunes + todosTienenBaremo + visitasPendientes).fold()
+
+        if (!validacionCompleta.valido) {
+            mostrarMensajeSiNoEsValido(validacionCompleta)
+        }
+
+        return validacionCompleta.valido
     }
 
     override fun hayQueSeleccionarEventoNuevo(hayEvento: Boolean): Boolean = !hayEvento
 
     private fun hayVisitasPendientes(partida: Partida): Validacion {
-        val jugadoresConSecretosPendientes = partida.jugadores.filter { jugador ->
-            jugador.pistas().any {
-                it is ElementoTablero.Pista.Secreto && it.id !in jugador.idsSecretosRevelados
-            }
-        }
-
-        return if (jugadoresConSecretosPendientes.isEmpty()) {
-            Validacion(true, null)
-        } else {
-            Validacion(false, "Adelaida debe visitar a ${jugadoresConSecretosPendientes.joinToStringHumanReadable { it.nombre }}")
-        }
+        val jugadoresVisitables = partida.jugadores.filter { puedeSerVisitado(it).valido }
+        return Validacion(jugadoresVisitables.isEmpty(), "Adelaida debe visitar a ${jugadoresVisitables.joinToStringHumanReadable { it.nombre }}")
     }
 
     private fun todosLosJugadoresTienenBaremo(jugadores: List<Jugador>): Validacion {

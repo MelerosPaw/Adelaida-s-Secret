@@ -72,9 +72,11 @@ interface GestorRonda {
      * * No hay evento o no es para esta ronda, o ya se ha realizado.
      */
     fun sePuedeCambiarDeRonda(partida: Partida): Boolean {
-        val validacionesComunes = validacionesComunes(partida)
-        mostrarMensajeSiNoEsValido(*validacionesComunes.toTypedArray())
-        return validacionesComunes.all { it.valido }
+        val validacionesComunes = validacionesComunes(partida).fold()
+        if (!validacionesComunes.valido) {
+            mostrarMensajeSiNoEsValido(validacionesComunes)
+        }
+        return validacionesComunes.valido
     }
 
     fun validacionesComunes(partida: Partida): List<Validacion> {
@@ -83,12 +85,8 @@ interface GestorRonda {
         return listOf(noHayJugadoresConMasPistasDelLimite, elEventoYaSeHaRealizadoONoEsParaEstaRonda)
     }
 
-    fun mostrarMensajeSiNoEsValido(vararg validaciones: Validacion) {
-        validaciones
-            .mapNotNull { it.mensaje }
-            .joinToString("\n") { "\t- $it" }
-            .takeIf { it.isNotBlank() }
-            ?.let { mostrarMensaje(Mensaje("No se puede cambiar de ronda aún:\n\n$it")) }
+    fun mostrarMensajeSiNoEsValido(validacion: Validacion) {
+        validacion.mensaje?.let { mostrarMensaje(Mensaje("No se puede cambiar de ronda aún:\n\n$it")) }
     }
 
     private fun comprobarLimitePistas(partida: Partida): Validacion {
@@ -143,5 +141,5 @@ interface GestorRonda {
         }
     }
 
-    class Validacion(val valido: Boolean, val mensaje: String?)
+
 }

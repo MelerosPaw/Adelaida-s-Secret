@@ -20,3 +20,5 @@ fun <T> List<T>.joinToStringHumanReadable(transform: (T) -> String): String =
 
 fun <T> Array<T>.joinToStringHumanReadable(transform: (T) -> String = { it.toString() }): String =
   toList().joinToStringHumanReadable(transform)
+
+fun List<*>.hasAtLeast(howManyAtLeast: Int) : Boolean = size >= howManyAtLeast

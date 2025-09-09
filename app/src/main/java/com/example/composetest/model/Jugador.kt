@@ -1,7 +1,10 @@
 package com.example.composetest.model
 
+import com.example.composetest.extensions.hasAtLeast
 import com.example.composetest.model.Evento.Comodin
 import java.util.LinkedList
+
+private const val PISTAS_MAXIMAS_EN_LA_VITRINA = 3
 
 /**
  * @param idsSecretosReveladosRonda Durante cada ronda, cada vez que un jugador adquiera un secreto,
@@ -41,9 +44,10 @@ data class Jugador(
     val comodines: List<Comodin> = LinkedList(),
     val efectos: List<Evento.Efecto> = LinkedList(),
 ) {
+    override fun toString(): String = "$nombre: ${cartas.size} cartas, ${pistas.size} pistas"
 
     fun darPista(pista: ElementoTablero.Pista): Boolean {
-        if (pistas.size == 3 || pistas.any { it.esLaMisma(pista) }) {
+        if (pistas.size == PISTAS_MAXIMAS_EN_LA_VITRINA || pistas.any { it.esLaMisma(pista) }) {
             return false
         } else {
             pistas.add(pista)
@@ -55,17 +59,25 @@ data class Jugador(
         pistas.removeIf { it.esLaMisma(pista) }
     }
 
-    fun tieneDemasiadasPistas(): Boolean = pistas.size > 3
+    fun desecharPistas() {
+        pistas.clear()
+    }
+
+    fun tieneDemasiadasPistas(): Boolean = pistas.size > PISTAS_MAXIMAS_EN_LA_VITRINA
 
     fun darCarta(carta: ElementoTablero.Carta) {
         cartas.add(carta)
+    }
+
+    fun desecharCartas() {
+        cartas.clear()
     }
 
     fun quitarCarta(carta: ElementoTablero.Carta) {
         cartas.remove(carta)
     }
 
-    fun pistaSinUbicar(): ElementoTablero.Pista? = pistas.getOrNull(3)
+    fun pistaSinUbicar(): ElementoTablero.Pista? = pistas.getOrNull(PISTAS_MAXIMAS_EN_LA_VITRINA)
 
     fun pistas(): List<ElementoTablero.Pista> = pistas
 
@@ -89,5 +101,11 @@ data class Jugador(
 
     infix fun noEsElMismoQue(otroJugador: Jugador?): Boolean = !(this esElMismoQue otroJugador)
 
-    override fun toString(): String = "$nombre: ${cartas.size} cartas, ${pistas.size} pistas"
+    fun tienePistasPorLasQueAunNoHaSidoVisitado(): Boolean = pistas().any {
+        it is ElementoTablero.Pista.Secreto && it.id !in idsSecretosRevelados
+    }
+
+    fun tieneSuficientesCartas(cuantasAlMenos: Int): Boolean = cartas().hasAtLeast(cuantasAlMenos)
+
+    fun tieneCarta(carta: ElementoTablero.Carta): Boolean = cartas().any { it == carta }
 }
