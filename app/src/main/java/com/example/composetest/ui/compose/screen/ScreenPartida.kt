@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -98,6 +99,7 @@ fun ScreenPartida(
     onAbandonar: () -> Unit,
     onMensaje: (Mensaje) -> Unit
 ) {
+    val context = LocalContext.current
     val viewModel: PartidaViewModel = hiltViewModel()
     viewModel.onMensaje = onMensaje
     viewModel.onAbandonar = onAbandonar
@@ -110,7 +112,7 @@ fun ScreenPartida(
         cambiarConfiguracionToolbar,
         viewModel.consumidor,
         viewModel.estado,
-        viewModel::onCambioRondaSolicitado,
+        { viewModel.onCambioRondaSolicitado(it, context) },
         viewModel::onMostrarDialogoCambioRonda,
         viewModel::onCambiarVisibilidadExplicacionRonda,
         viewModel::onCerrarTituloSiguienteRonda,

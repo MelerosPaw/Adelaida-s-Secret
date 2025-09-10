@@ -1,5 +1,6 @@
 package com.example.composetest.ui.viewmodel
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -84,13 +85,12 @@ class PartidaViewModel @Inject constructor(
         obtenerPartida(params.idPartida)
     }
 
-    fun onCambioRondaSolicitado(infoRondaActual: InfoRonda) {
-        comprobarSiSePuedeCambiarDeRonda(infoRondaActual)
-    }
-
-    private fun comprobarSiSePuedeCambiarDeRonda(infoRondaActual: InfoRonda) {
+    fun onCambioRondaSolicitado(infoRondaActual: InfoRonda, context: Context) {
         noneNull(estado.partida.value.partida, gestorRonda) { partida, gestor ->
-            onCondicionesCambioRondaSatisfechas(gestor.sePuedeCambiarDeRonda(partida), infoRondaActual)
+            onCondicionesCambioRondaSatisfechas(
+                gestor.sePuedeCambiarDeRonda(partida, context),
+                infoRondaActual
+            )
         }
     }
 

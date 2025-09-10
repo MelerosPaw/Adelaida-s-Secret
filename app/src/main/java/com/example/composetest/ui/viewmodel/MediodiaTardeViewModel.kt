@@ -1,5 +1,6 @@
 package com.example.composetest.ui.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -72,6 +73,7 @@ class MediodiaTardeViewModel @Inject constructor(
         cambioRondaSolicitado: Boolean,
         onCondicionesCambioRondaSatisfechas: (Boolean) -> Unit,
         onMostrarMensajeAbandonar: () -> Unit,
+        context: Context
     ) {
         this.estados = EstadoMediodiaTarde(partida)
         this.partida = partida
@@ -90,7 +92,7 @@ class MediodiaTardeViewModel @Inject constructor(
             // TODO Melero: 16/2/25 Comprobar si no se está ya haciendo las comprobaciones
         } else if (!this.cambioRondaSolicitado) {
             this.cambioRondaSolicitado = true
-            comprobarSiSePuedeCambiarDeRonda()
+            comprobarSiSePuedeCambiarDeRonda(context)
         }
     }
 
@@ -172,9 +174,9 @@ class MediodiaTardeViewModel @Inject constructor(
         }
     }
 
-    private fun comprobarSiSePuedeCambiarDeRonda() {
+    private fun comprobarSiSePuedeCambiarDeRonda(context: Context) {
         noneNull(partida, gestorRonda, onCondicionesCambioRondaSatisfechas) {
-            partida, gestor, onComprobado -> onComprobado(gestor.sePuedeCambiarDeRonda(partida))
+            partida, gestor, onComprobado -> onComprobado(gestor.sePuedeCambiarDeRonda(partida, context))
         }
     }
 

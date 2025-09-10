@@ -2,6 +2,9 @@ package com.example.composetest
 
 import com.example.composetest.model.ElementoTablero
 import com.example.composetest.ui.compose.sampledata.jugadores
+import com.example.composetest.ui.manager.Validacion
+import com.example.composetest.ui.manager.ValidacionVisita
+import com.example.composetest.ui.manager.run
 import com.example.composetest.ui.manager.puedeSerVisitado
 import junit.framework.TestCase
 import org.junit.Test
@@ -26,7 +29,10 @@ class VisitaAdelaidaTest {
       idsSecretosRevelados = emptyList()
     )
     val result = puedeSerVisitado(jugadorConSecreto)
-    TestCase.assertTrue(result.mensaje, result.valido)
+    TestCase.assertTrue(result.run())
+    assertCorrectValidations(result, true, ValidacionVisita.TieneSuficientesCartas(jugador), true)
+    assertCorrectValidations(result, true, ValidacionVisita.TieneUnSecretoNuevo(jugador), true)
+    assertCorrectValidations(result, true, ValidacionVisita.NoTieneElPerseskud(jugador), true)
   }
 
   @Test
@@ -34,8 +40,23 @@ class VisitaAdelaidaTest {
     val jugador = jugadores("Pedrito")[0]
     jugador.desecharCartas()
     val result = puedeSerVisitado(jugador)
-    TestCase.assertFalse(result.valido)
-    TestCase.assertTrue(result.mensaje?.contains("El jugador no tiene suficientes cartas para ser visitado") == true)
+    assertCorrectValidations(result, false, ValidacionVisita.TieneSuficientesCartas(jugador), false)
+  }
+
+  private fun assertCorrectValidations(
+    result: List<Validacion>,
+    expectedValido: Boolean,
+    expectedValidacion: ValidacionVisita,
+    expectedValidacionValido: Boolean
+  ) {
+    val validacionResultante = result.firstOrNull { it::class == expectedValidacion::class }
+    TestCase.assertEquals(expectedValido, result.run())
+    TestCase.assertTrue("No tiene la validación correcta", validacionResultante != null)
+    TestCase.assertEquals(
+      "Contiene la validación, pero es ${!expectedValidacionValido}",
+      expectedValidacionValido,
+      validacionResultante!!.validar()
+    )
   }
 
   @Test
@@ -44,8 +65,7 @@ class VisitaAdelaidaTest {
     jugador.desecharCartas()
     jugador.darCarta(ElementoTablero.Carta.Perseskud())
     val result = puedeSerVisitado(jugador)
-    TestCase.assertFalse(result.valido)
-    TestCase.assertTrue(result.mensaje?.contains("El jugador no puede ser visitado porque tiene el Perseskud") == true)
+    assertCorrectValidations(result, false, ValidacionVisita.NoTieneElPerseskud(jugador), false)
   }
 
   @Test
@@ -53,8 +73,7 @@ class VisitaAdelaidaTest {
     val jugador = jugadores("Pedrito")[0]
     jugador.desecharPistas()
     val result = puedeSerVisitado(jugador)
-    TestCase.assertFalse(result.valido)
-    TestCase.assertTrue(result.mensaje?.contains("El jugador no tiene ningún secreto nuevo") == true)
+    assertCorrectValidations(result, false, ValidacionVisita.TieneUnSecretoNuevo(jugador), false)
   }
 
   @Test
@@ -72,8 +91,7 @@ class VisitaAdelaidaTest {
       idsSecretosRevelados = listOf(secreto1.id, secreto2.id, secreto3.id)
     )
     val result = puedeSerVisitado(jugadorConSecretos)
-    TestCase.assertFalse(result.valido)
-    TestCase.assertTrue(result.mensaje?.contains("El jugador no tiene ningún secreto nuevo") == true)
+    assertCorrectValidations(result, false, ValidacionVisita.TieneUnSecretoNuevo(jugador), false)
   }
 
   @Test
@@ -89,7 +107,6 @@ class VisitaAdelaidaTest {
       idsSecretosRevelados = listOf(secreto1.id)
     )
     val result = puedeSerVisitado(jugadorConSecretos)
-    TestCase.assertFalse(result.valido)
-    TestCase.assertFalse(result.mensaje?.contains("El jugador no tiene ningún secreto nuevo") == true)
+    assertCorrectValidations(result, false, ValidacionVisita.TieneUnSecretoNuevo(jugador), true)
   }
 }

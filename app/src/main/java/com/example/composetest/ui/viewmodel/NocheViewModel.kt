@@ -1,5 +1,6 @@
 package com.example.composetest.ui.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -73,7 +74,12 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
   }
 
   //region Públicos
-  fun inicializar(partida: Partida?, cambioRondaSolicitado: Boolean, onCondicionesCambioRondaSatisfechas: ((Boolean) -> Unit)) {
+  fun inicializar(
+    partida: Partida?,
+    cambioRondaSolicitado: Boolean,
+    onCondicionesCambioRondaSatisfechas: ((Boolean) -> Unit),
+    context: Context
+  ) {
     this.partida = partida
     partida?.let {
       gestorRonda = onMensaje?.let { GestorRonda.Factory.from(partida.ronda, it) }
@@ -87,7 +93,7 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
       // TODO Melero: 16/2/25 Comprobar si no se está ya haciendo las comprobaciones
     } else if (!this.cambioRondaSolicitado) {
       this.cambioRondaSolicitado = true
-      comprobarSiSePuedeCambiarDeRonda()
+      comprobarSiSePuedeCambiarDeRonda(context)
     }
   }
 
@@ -230,9 +236,9 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
   //endregion
 
   //region Privados
-  private fun comprobarSiSePuedeCambiarDeRonda() {
+  private fun comprobarSiSePuedeCambiarDeRonda(context: Context) {
     noneNull(partida, gestorRonda, onCondicionesCambioRondaSatisfechas) { partida, gestor, onComprobado ->
-      onComprobado(gestor.sePuedeCambiarDeRonda(partida))
+      onComprobado(gestor.sePuedeCambiarDeRonda(partida, context))
     }
   }
 

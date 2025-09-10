@@ -1,11 +1,14 @@
 package com.example.composetest.ui.manager
 
+import android.content.Context
 import androidx.annotation.StringRes
 import com.example.composetest.R
+import com.example.composetest.extensions.getPlural
 import com.example.composetest.extensions.joinToStringHumanReadable
 import com.example.composetest.model.ElementoTablero
 import com.example.composetest.model.Evento
 import com.example.composetest.model.Jugador
+import com.example.composetest.model.PISTAS_MAXIMAS_EN_LA_VITRINA
 import com.example.composetest.model.Partida
 import com.example.composetest.model.Partida.Ronda
 import com.example.composetest.ui.compose.PosibleAccionProhibida
@@ -66,63 +69,74 @@ interface GestorRonda {
         is ElementoTablero.Pista -> R.string.advertencia_reasignacion_pista_mediodia
     }
 
+    fun hayQueSeleccionarEventoNuevo(hayEvento: Boolean): Boolean = false
+
     /**
      * Se puede seguir solo si:
      * * Todos los jugadores tienen 3 pistas como mucho.
      * * No hay evento o no es para esta ronda, o ya se ha realizado.
      */
-    fun sePuedeCambiarDeRonda(partida: Partida): Boolean {
-        val validacionesComunes = validacionesComunes(partida).fold()
-        if (!validacionesComunes.valido) {
-            mostrarMensajeSiNoEsValido(validacionesComunes)
+    fun sePuedeCambiarDeRonda(partida: Partida, context: Context): Boolean {
+        val validacionesComunes = validacionesComunes(partida)
+
+        if (!validacionesComunes.run()) {
+            mostrarMensajeSiNoEsValido(validacionesComunes, context)
         }
-        return validacionesComunes.valido
+        return validacionesComunes.run()
     }
 
     fun validacionesComunes(partida: Partida): List<Validacion> {
-        val noHayJugadoresConMasPistasDelLimite = comprobarLimitePistas(partida)
-        val elEventoYaSeHaRealizadoONoEsParaEstaRonda = comprobarEvento(partida)
-        return listOf(noHayJugadoresConMasPistasDelLimite, elEventoYaSeHaRealizadoONoEsParaEstaRonda)
+        val limitePistas = ValidacionCambioRonda.NadieRebasaElLimiteDePistas(partida)
+        val okWithEvent = ValidacionCambioRonda.EventoYaRalizadoONoTocaAhora(partida,
+            ::seEjecutaAhora, ::hayQueSeleccionarEventoNuevo)
+        return listOf(limitePistas, okWithEvent)
     }
 
-    fun mostrarMensajeSiNoEsValido(validacion: Validacion) {
-        validacion.mensaje?.let { mostrarMensaje(Mensaje("No se puede cambiar de ronda aún:\n\n$it")) }
+    fun mostrarMensajeSiNoEsValido(validaciones: List<Validacion>, context: Context) {
+        val mensajeFormateado: String? = validaciones
+            .filter { !it.validar() }
+            .mapNotNull { obtenerMensajesDeValidacion(it, context) }
+            .joinToString("\n") { "\t- $it" }
+            .takeIf { it.isNotBlank() }
+
+        mensajeFormateado?.let { mostrarMensaje(Mensaje("No se puede cambiar de ronda aún:\n\n$it")) }
     }
 
-    private fun comprobarLimitePistas(partida: Partida): Validacion {
-        val jugadoresConDemasiadasPistas = partida.jugadores.filter { it.tieneDemasiadasPistas() }
-        val vale = jugadoresConDemasiadasPistas.isEmpty()
-        val mensaje = jugadoresConDemasiadasPistas.takeIf { !vale }?.let { mostrarJugadoresConDemasiadasPistas(it) }
-        return Validacion(vale, mensaje)
-    }
+    fun obtenerMensajesDeValidacion(validacion: Validacion, context: Context): String? =
+        when (validacion) {
+            is ValidacionCambioRonda.NadieRebasaElLimiteDePistas ->
+                obtenerMensajeExcesoPistas(validacion.quienesRebasan, context)
 
-    private fun mostrarJugadoresConDemasiadasPistas(jugadores: List<Jugador>): String {
-        val nombresDeJugadores = jugadores.joinToStringHumanReadable { it.nombre }
-        val tienen = "tienen".takeIf { jugadores.size > 1 } ?: "tiene"
-        val deben = "Deben".takeIf { jugadores.size > 1 } ?: "Debe"
-        return "$nombresDeJugadores aún $tienen más de tres pistas en la vitrina. " +
-            "$deben deshacerse de una de ellas para poder continuar."
-    }
+            is ValidacionCambioRonda.EventoYaRalizadoONoTocaAhora ->
+                obtenerMensajeEventoRealizado(validacion, context)
 
-    fun comprobarEvento(partida: Partida): Validacion {
-        val hayEvento = partida.eventoActual != null
-        val elEventoSeHaEjecutado = partida.eventoActualEjecutado
-        val elEventoVaEnEstaRonda = hayEvento && seEjecutaAhora(partida.eventoActual)
-
-        val yaSeHaEjecutado = !hayEvento && elEventoSeHaEjecutado
-        val noEsEnEstaRonda = hayEvento && !elEventoSeHaEjecutado && !elEventoVaEnEstaRonda
-        val pendienteEjecucion = hayEvento && !elEventoSeHaEjecutado && elEventoVaEnEstaRonda
-        val hayQueSeleccionarEventoNuevo = hayQueSeleccionarEventoNuevo(hayEvento)
-
-        val mensaje = when {
-            pendienteEjecucion -> "El evento sucede en esta ronda y aún no se ha realizado."
-            hayQueSeleccionarEventoNuevo -> "Aún no se ha seleccionado evento."
             else -> null
         }
-        return Validacion(yaSeHaEjecutado || noEsEnEstaRonda || (!hayEvento && !hayQueSeleccionarEventoNuevo), mensaje)
+
+    private fun obtenerMensajeEventoRealizado(
+        validacion: ValidacionCambioRonda.EventoYaRalizadoONoTocaAhora,
+        context: Context
+    ): String? = when {
+        validacion.pendienteEjecucion -> context.getString(R.string.evento_pendiente_de_ejecucion)
+        validacion.seNecesitaEventoNuevo -> context.getString(R.string.evento_no_seleccionado_aun)
+        else -> null
     }
 
-    fun hayQueSeleccionarEventoNuevo(hayEvento: Boolean): Boolean = false
+    private fun obtenerMensajeExcesoPistas(
+        jugadoresConDemasiadas: List<Jugador>,
+        context: Context
+    ): String? =
+        jugadoresConDemasiadas
+            .joinToStringHumanReadable { it.nombre }
+            .takeIf { it.isNotEmpty() }
+            ?.let {
+                context.getPlural(
+                    R.plurals.jugadores_con_mas_pistas_de_las_debidas,
+                    jugadoresConDemasiadas.size,
+                    it,
+                    PISTAS_MAXIMAS_EN_LA_VITRINA
+                )
+            }
 
     class Factory {
 
@@ -141,5 +155,38 @@ interface GestorRonda {
         }
     }
 
+    sealed class ValidacionCambioRonda(): Validacion {
+
+        class NadieRebasaElLimiteDePistas(val partida: Partida) : ValidacionCambioRonda() {
+
+            val quienesRebasan: List<Jugador>
+                get() = partida.jugadores.filter { it.tieneDemasiadasPistas() }
+
+            override fun validar(): Boolean = quienesRebasan.isEmpty()
+        }
+
+        class EventoYaRalizadoONoTocaAhora(
+            val partida: Partida,
+            val seEjecutaAhora: (Evento) -> Boolean,
+            val hayQueSeleccionarEventoNuevo: (hayEvento: Boolean) -> Boolean
+        ): ValidacionCambioRonda() {
+
+            var pendienteEjecucion: Boolean = false
+            var seNecesitaEventoNuevo: Boolean = false
+
+            override fun validar(): Boolean {
+                val hayEvento = partida.eventoActual != null
+                val elEventoSeHaEjecutado = partida.eventoActualEjecutado
+                val elEventoVaEnEstaRonda = hayEvento && seEjecutaAhora(partida.eventoActual)
+
+                val yaSeHaEjecutado = !hayEvento && elEventoSeHaEjecutado
+                val noEsEnEstaRonda = hayEvento && !elEventoSeHaEjecutado && !elEventoVaEnEstaRonda
+                pendienteEjecucion = hayEvento && !elEventoSeHaEjecutado && elEventoVaEnEstaRonda
+                seNecesitaEventoNuevo = hayQueSeleccionarEventoNuevo(hayEvento)
+
+                return yaSeHaEjecutado || noEsEnEstaRonda || (!hayEvento && !seNecesitaEventoNuevo)
+            }
+        }
+    }
 
 }

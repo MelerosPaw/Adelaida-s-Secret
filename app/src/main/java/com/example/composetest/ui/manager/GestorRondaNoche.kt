@@ -1,7 +1,9 @@
 package com.example.composetest.ui.manager
 
+import android.content.Context
 import androidx.annotation.StringRes
 import com.example.composetest.R
+import com.example.composetest.extensions.getPlural
 import com.example.composetest.extensions.joinToStringHumanReadable
 import com.example.composetest.model.Jugador
 import com.example.composetest.model.Partida
@@ -25,39 +27,76 @@ class GestorRondaNoche(
             is PosibleAccionProhibida.CambioTab -> null
         }
 
-    override fun sePuedeCambiarDeRonda(partida: Partida): Boolean {
+    override fun sePuedeCambiarDeRonda(partida: Partida, context: Context): Boolean {
         val validacionesComunes = validacionesComunes(partida)
-        val todosTienenBaremo = todosLosJugadoresTienenBaremo(partida.jugadores.toList())
-        val visitasPendientes = hayVisitasPendientes(partida)
-        val validacionCompleta = (validacionesComunes + todosTienenBaremo + visitasPendientes).fold()
+        val todosTienenBaremo = ValidacionCambioRondaNoche.TodosLosJugadoresTienenBaremo(partida.jugadores.toList())
+        val visitasPendientes = ValidacionCambioRondaNoche.NoHayVisitasPendientes(partida)
+        val validacionCompleta = (validacionesComunes + todosTienenBaremo + visitasPendientes)
 
-        if (!validacionCompleta.valido) {
-            mostrarMensajeSiNoEsValido(validacionCompleta)
+        val sePuede = validacionCompleta.run()
+
+        if (!sePuede) {
+            mostrarMensajeSiNoEsValido(validacionCompleta, context)
         }
 
-        return validacionCompleta.valido
+        return sePuede
     }
+
+    override fun obtenerMensajesDeValidacion(validacion: Validacion, context: Context): String? =
+        when (validacion) {
+            is ValidacionCambioRondaNoche.TodosLosJugadoresTienenBaremo ->
+                obtenerMensajeJugadoresSinBaremo(validacion, context)
+
+            is ValidacionCambioRondaNoche.NoHayVisitasPendientes ->
+                obtenerMensajeJugadoresPendientesDeSerVisitados(validacion, context)
+
+            is ValidacionVisita.TieneUnSecretoNuevo ->
+                context.getString(R.string.jugador_sin_secretos_nuevos)
+
+            is ValidacionVisita.TieneSuficientesCartas ->
+                context.getString(R.string.jugador_sin_cartas_suficientes_para_visita)
+
+            is ValidacionVisita.NoTieneElPerseskud ->
+                context.getString(R.string.jugador_con_perseskud)
+
+            else -> super.obtenerMensajesDeValidacion(validacion, context)
+        }
 
     override fun hayQueSeleccionarEventoNuevo(hayEvento: Boolean): Boolean = !hayEvento
 
-    private fun hayVisitasPendientes(partida: Partida): Validacion {
-        val jugadoresVisitables = partida.jugadores.filter { puedeSerVisitado(it).valido }
-        return Validacion(jugadoresVisitables.isEmpty(), "Adelaida debe visitar a ${jugadoresVisitables.joinToStringHumanReadable { it.nombre }}")
-    }
-
-    private fun todosLosJugadoresTienenBaremo(jugadores: List<Jugador>): Validacion {
-        val jugadoresSinBaremos = jugadores
-            .filter { it.idBaremo == null }
-
-        val mensaje = if (jugadoresSinBaremos.isNotEmpty()) {
-            val cantidad = jugadoresSinBaremos.size
-            val nombres = jugadoresSinBaremos.joinToStringHumanReadable { it.nombre }
-            val tienen = "tienen".takeIf { cantidad > 1 } ?: "tiene"
-            "$nombres aún no $tienen un baremo seleccionado."
-        } else {
-            null
+    fun obtenerMensajeJugadoresSinBaremo(
+        validacion: ValidacionCambioRondaNoche.TodosLosJugadoresTienenBaremo,
+        context: Context
+    ): String? = validacion.jugadoresSinBaremo
+        .takeIf { it.isNotEmpty() }
+        ?.let {
+            context.getPlural(
+                R.plurals.jugadores_sin_baremo,
+                it.size,
+                it.joinToStringHumanReadable { jugador -> jugador.nombre }
+            )
         }
 
-        return Validacion(jugadoresSinBaremos.isEmpty(), mensaje)
+    fun obtenerMensajeJugadoresPendientesDeSerVisitados(
+        pendientes: ValidacionCambioRondaNoche.NoHayVisitasPendientes,
+        context: Context
+    ): String = context.getString(
+        R.string.adelaida_debe_visitar_a,
+        pendientes.jugadoresVisitables.joinToStringHumanReadable { it.nombre })
+
+    sealed class ValidacionCambioRondaNoche(): Validacion {
+        class TodosLosJugadoresTienenBaremo(jugadores: List<Jugador>): Validacion {
+
+            val jugadoresSinBaremo = jugadores.filter { it.idBaremo == null }
+
+            override fun validar(): Boolean = jugadoresSinBaremo.isEmpty()
+        }
+
+        class NoHayVisitasPendientes(partida: Partida): Validacion {
+
+            val jugadoresVisitables = partida.jugadores.filter { puedeSerVisitado(it).run() }
+
+            override fun validar(): Boolean = jugadoresVisitables.isEmpty()
+        }
     }
 }

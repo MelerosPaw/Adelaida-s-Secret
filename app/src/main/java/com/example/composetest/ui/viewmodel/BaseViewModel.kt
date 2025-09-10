@@ -15,6 +15,7 @@ import javax.inject.Inject
 
 open class BaseViewModel: ViewModel() {
 
+    // TODO Melero: 10/9/25 No usar esto para strings!!!!
     @Inject
     @ApplicationContext
     lateinit var context: Context

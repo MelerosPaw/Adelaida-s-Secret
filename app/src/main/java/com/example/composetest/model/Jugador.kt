@@ -4,7 +4,7 @@ import com.example.composetest.extensions.hasAtLeast
 import com.example.composetest.model.Evento.Comodin
 import java.util.LinkedList
 
-private const val PISTAS_MAXIMAS_EN_LA_VITRINA = 3
+const val PISTAS_MAXIMAS_EN_LA_VITRINA = 3
 
 /**
  * @param idsSecretosReveladosRonda Durante cada ronda, cada vez que un jugador adquiera un secreto,

@@ -5,21 +5,27 @@ import com.example.composetest.model.Jugador
 
 const val CARTAS_NECESARIAS_PARA_SER_VISITADO = 2
 
-fun puedeSerVisitado(jugador: Jugador) : Validacion {
-  val tieneUnSecrtoNuevo = Validacion(
-    jugador.tienePistasPorLasQueAunNoHaSidoVisitado(),
-    "El jugador no tiene ningún secreto nuevo"
-  )
+fun puedeSerVisitado(jugador: Jugador) : List<Validacion> = listOf(
+  ValidacionVisita.TieneUnSecretoNuevo(jugador),
+  ValidacionVisita.TieneSuficientesCartas(jugador),
+  ValidacionVisita.NoTieneElPerseskud(jugador)
+)
 
-  val tieneSuficientesCartas = Validacion(
-    jugador.tieneSuficientesCartas(CARTAS_NECESARIAS_PARA_SER_VISITADO),
-    "El jugador no tiene suficientes cartas para ser visitado"
-  )
+sealed class ValidacionVisita(): Validacion {
 
-  val noTieneElPerseskud = Validacion(
-    !jugador.tieneCarta(ElementoTablero.Carta.Perseskud()),
-    "El jugador no puede ser visitado porque tiene el Perseskud"
-  )
+  class TieneUnSecretoNuevo(private val jugador: Jugador): ValidacionVisita() {
 
-  return listOf(tieneUnSecrtoNuevo, tieneSuficientesCartas, noTieneElPerseskud).fold()
+    override fun validar(): Boolean = jugador.tienePistasPorLasQueAunNoHaSidoVisitado()
+  }
+  
+  class TieneSuficientesCartas(private val jugador: Jugador): ValidacionVisita() {
+
+    override fun validar(): Boolean =
+      jugador.tieneSuficientesCartas(CARTAS_NECESARIAS_PARA_SER_VISITADO)
+  }
+
+  class NoTieneElPerseskud(private val jugador: Jugador): ValidacionVisita() {
+
+    override fun validar(): Boolean = !jugador.tieneCarta(ElementoTablero.Carta.Perseskud())
+  }
 }

@@ -58,10 +58,11 @@ fun ScreenMediodiaTarde(
   cambiarATarde: State<EventoBooleano>?,
   onMostrarMensajeAbandondar: () -> Unit,
 ) {
+  val context = LocalContext.current
   val viewModel: MediodiaTardeViewModel = hiltViewModel()
   viewModel.onMensaje = onMensaje
   viewModel.inicializar(partida, onMostrarPapelera, cambioRondaSolicitado,
-    onCondicionesCambioRondaSatisfechas, onMostrarMensajeAbandondar)
+    onCondicionesCambioRondaSatisfechas, onMostrarMensajeAbandondar, context)
 
   cambiarATarde?.let {
     val cambiarATarde by remember { it }
