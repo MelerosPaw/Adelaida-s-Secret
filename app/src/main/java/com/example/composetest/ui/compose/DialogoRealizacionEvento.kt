@@ -37,16 +37,16 @@ import com.example.composetest.ui.compose.widget.Encabezado
 import com.example.composetest.ui.compose.widget.Explicacion
 import com.example.composetest.ui.compose.widget.dialog.AdelaidaDialog
 import com.example.composetest.ui.compose.widget.dialog.AdelaidaDialogOutlinedButton
-import com.example.composetest.ui.contracts.Consumidor
-import com.example.composetest.ui.contracts.Intencion
-import com.example.composetest.ui.contracts.Intencion.MarcarGanadorEvento
-import com.example.composetest.ui.viewmodel.Estados
+import com.example.composetest.ui.contracts.ConsumidorNoche
+import com.example.composetest.ui.contracts.IntencionNoche
+import com.example.composetest.ui.contracts.IntencionNoche.MarcarGanadorEvento
+import com.example.composetest.ui.viewmodel.EstadoNoche
 import com.example.composetest.ui.viewmodel.NocheViewModel.EventoRealizandose
 import com.example.composetest.ui.viewmodel.NocheViewModel.JugadorVO
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DialogoRealizacionEvento(estados: Estados, consumidor: Consumidor) {
+fun DialogoRealizacionEvento(estados: EstadoNoche, consumidor: ConsumidorNoche) {
   val eventoRealizandose by remember { estados.eventoRealizandose }
 
   eventoRealizandose?.let { evento ->
@@ -67,7 +67,7 @@ fun DialogoRealizacionEvento(estados: Estados, consumidor: Consumidor) {
           .fillMaxWidth()
           .weight(1f), verticalAlignment = Alignment.Top
         ) {
-          when(it) {
+          when (it) {
             0 -> ExplicacionEvento(evento, colorTexto)
             1 -> SeleccionJugadoresAfectados(evento, colorTexto, consumidor)
             else -> ResumenEvento(seleccionados, evento)
@@ -102,7 +102,7 @@ private fun ExplicacionEvento(evento: EventoRealizandose, colorTexto: Color) {
 private fun SeleccionJugadoresAfectados(
   evento: EventoRealizandose,
   colorTexto: Color,
-  consumidor: Consumidor
+  consumidor: ConsumidorNoche
 ) {
   Column {
     val cantidadGanadores = evento.evento.maxGanadores.obtenerCantidadGanadores()
@@ -134,7 +134,7 @@ private fun SeleccionJugadoresAfectados(
     }
 
     BotonDesempate(
-      { consumidor.consumir(Intencion.MostrarMensaje(it)) },
+      { consumidor.consumir(IntencionNoche.MostrarMensaje(it)) },
       Modifier.align(Alignment.CenterHorizontally)
     )
   }
@@ -160,7 +160,7 @@ private fun ResumenEvento(seleccionados: List<JugadorVO>, evento: EventoRealizan
 
 @Composable
 private fun BotonesDialogoRealizacion(
-  consumidor: Consumidor,
+  consumidor: ConsumidorNoche,
   currentPage: Int,
   evento: EventoRealizandose,
   colorTexto: Color,
@@ -171,9 +171,9 @@ private fun BotonesDialogoRealizacion(
   val esLaPrimeraPagina = currentPage == 0
   val textoBotonSiguiente = stringResource(R.string.fin_del_evento).takeIf { esLaUltimaPagina }
   val textoBotonAnterior = stringResource(R.string.cancelar_realizacion_evento).takeIf { esLaPrimeraPagina }
-  val clicSiguiente = { consumidor.consumir(Intencion.DarEventoPorRealizado(evento)) }
+  val clicSiguiente = { consumidor.consumir(IntencionNoche.DarEventoPorRealizado(evento)) }
     .takeIf { esLaUltimaPagina }
-  val clicAnterior = { consumidor.consumir(Intencion.CerrarRealizacionEvento(evento)) }
+  val clicAnterior = { consumidor.consumir(IntencionNoche.CerrarRealizacionEvento(evento)) }
     .takeIf { esLaPrimeraPagina }
 
   AdelaidaText("${currentPage.inc()}/3")

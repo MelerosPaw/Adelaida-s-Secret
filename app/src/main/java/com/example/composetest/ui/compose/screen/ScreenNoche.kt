@@ -3,31 +3,42 @@ package com.example.composetest.ui.compose.screen
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetest.R
-import com.example.composetest.model.Baremo
-import com.example.composetest.model.Jugador
+import com.example.composetest.extensions.get
+import com.example.composetest.extensions.hasAtLeast
+import com.example.composetest.model.ElementoTablero
 import com.example.composetest.model.Partida
 import com.example.composetest.ui.compose.DialogoRealizacionEvento
 import com.example.composetest.ui.compose.NightAndDay
@@ -35,6 +46,7 @@ import com.example.composetest.ui.compose.NombreJugadorEditable
 import com.example.composetest.ui.compose.navegacion.Mensaje
 import com.example.composetest.ui.compose.sampledata.eventos
 import com.example.composetest.ui.compose.sampledata.eventosVo
+import com.example.composetest.ui.compose.sampledata.jugador
 import com.example.composetest.ui.compose.sampledata.jugadores
 import com.example.composetest.ui.compose.theme.MargenEstandar
 import com.example.composetest.ui.compose.theme.Tema
@@ -52,14 +64,19 @@ import com.example.composetest.ui.compose.widget.dialog.AdelaidaDialog
 import com.example.composetest.ui.compose.widget.dialog.OpcionDialogo
 import com.example.composetest.ui.compose.widget.rememberListadoBaremosState
 import com.example.composetest.ui.contracts.Consumidor
-import com.example.composetest.ui.contracts.Intencion
-import com.example.composetest.ui.contracts.Intencion.AbrirDialogoSeleccionManualEventos
-import com.example.composetest.ui.contracts.Intencion.GuardarBaremo
-import com.example.composetest.ui.contracts.Intencion.OcultarDialogoEjecucionEvento
-import com.example.composetest.ui.contracts.Intencion.RealizarEventoSeleccionado
-import com.example.composetest.ui.contracts.Intencion.SeleccionarEvento
-import com.example.composetest.ui.contracts.Intencion.SeleccionarEventoAleatorio
-import com.example.composetest.ui.viewmodel.Estados
+import com.example.composetest.ui.contracts.ConsumidorNoche
+import com.example.composetest.ui.contracts.IntencionNoche
+import com.example.composetest.ui.contracts.IntencionNoche.AbrirDialogoSeleccionManualEventos
+import com.example.composetest.ui.contracts.IntencionNoche.GuardarBaremo
+import com.example.composetest.ui.contracts.IntencionNoche.OcultarDialogoEjecucionEvento
+import com.example.composetest.ui.contracts.IntencionNoche.RealizarEventoSeleccionado
+import com.example.composetest.ui.contracts.IntencionNoche.SeleccionarEvento
+import com.example.composetest.ui.contracts.IntencionNoche.SeleccionarEventoAleatorio
+import com.example.composetest.ui.manager.InfoVisita
+import com.example.composetest.ui.manager.ValidacionVisita
+import com.example.composetest.ui.manager.puedeSerVisitado
+import com.example.composetest.ui.manager.run
+import com.example.composetest.ui.viewmodel.EstadoNoche
 import com.example.composetest.ui.viewmodel.NocheViewModel
 import com.example.composetest.ui.viewmodel.NocheViewModel.EventoRealizandose
 import com.example.composetest.ui.viewmodel.NocheViewModel.JugadorVO
@@ -86,7 +103,7 @@ fun ScreenNoche(
     viewModel.onMensaje = onMensaje
     viewModel.inicializar(partida, cambioRondaSolicitado, onCondicionesCambioRondaSatisfechas, context)
 
-    ScreenNoche(
+    Screen(
         viewModel.estados,
         viewModel.consumidor,
         partida?.id,
@@ -95,9 +112,9 @@ fun ScreenNoche(
 }
 
 @Composable
-private fun ScreenNoche(
-    estados: Estados,
-    consumidor: Consumidor,
+private fun Screen(
+    estado: EstadoNoche,
+    consumidor: ConsumidorNoche,
     idPartida: Long?,
     comprobarNombreRepetido: (String) -> Boolean,
 ) {
@@ -107,54 +124,56 @@ private fun ScreenNoche(
         .padding(horizontal = MargenEstandar)
         .verticalScroll(scroll)
     ) {
-        SeccionBaremos(estados, consumidor, idPartida, comprobarNombreRepetido)
+        SeccionBaremos(estado, consumidor, idPartida, comprobarNombreRepetido)
         AdelaidaDivider(Modifier.padding(top = 10.dp))
-        SeccionEvento(estados, consumidor)
+        SeccionEvento(estado, consumidor)
         AdelaidaDivider(Modifier.padding(top = 10.dp))
-        SeccionVisitaAdelaida()
+        SeccionVisitaAdelaida(estado, consumidor)
     }
 
-    DialogoSeleccionBaremos(estados, consumidor)
-    DialogoConfirmarEjecucionAhora(estados, consumidor)
+    DialogoSeleccionBaremos(estado, consumidor)
+    DialogoConfirmarEjecucionAhora(estado, consumidor)
 }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 private fun SeccionBaremos(
-    estados: Estados,
-    consumidor: Consumidor,
+    estados: EstadoNoche,
+    consumidor: ConsumidorNoche,
     idPartida: Long?,
     comprobarNombreRepetido: (String) -> Boolean
 ) {
     val jugadores by remember { estados.jugadores }
-
-    Titulo("Baremos")
-    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        jugadores.forEach {
-            Column(
-                Modifier
-                    .clickable { consumidor.consumir(Intencion.AbrirDialogoBaremos(it)) }
-                    .padding(top = MargenEstandar)
-                    .padding(horizontal = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                NombreJugadorEditable(
-                    it, idPartida, { }, comprobarNombreRepetido,
-                    nivelTitulo = NivelTitulo.Nivel3, textAlign = TextAlign.Center
-                )
-                Titulo(
-                    it.idBaremo ?: "Sin baremo", nivel = NivelTitulo.Nivel1,
-                    textAlign = TextAlign.Center
-                )
+    Seccion(
+        cabecera = { Titulo("Baremos") },
+        contenido = {
+            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                jugadores.forEach {
+                    Column(
+                        Modifier
+                            .clickable { consumidor.consumir(IntencionNoche.AbrirDialogoBaremos(it)) }
+                            .padding(top = MargenEstandar)
+                            .padding(horizontal = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        NombreJugadorEditable(
+                            it, idPartida, { }, comprobarNombreRepetido,
+                            nivelTitulo = NivelTitulo.Nivel3, textAlign = TextAlign.Center
+                        )
+                        Titulo(
+                            it.idBaremo ?: "Sin baremo", nivel = NivelTitulo.Nivel1,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
             }
-        }
-    }
+        })
 }
 
 @Composable
-private fun DialogoSeleccionBaremos(estados: Estados, consumidor: Consumidor) {
+private fun DialogoSeleccionBaremos(estados: EstadoNoche, consumidor: ConsumidorNoche) {
     val estadoBaremos by remember { estados.estadoDialogoBaremos }
-    val cerrarDialogoBaremos = { consumidor.consumir(Intencion.CerrarBaremo()) }
+    val cerrarDialogoBaremos = { consumidor.consumir(IntencionNoche.CerrarBaremo()) }
 
     estadoBaremos?.let {
         AdelaidaDialog(cerrarDialogoBaremos, DialogProperties(true, true, false), contentMustScroll = false) {
@@ -166,7 +185,7 @@ private fun DialogoSeleccionBaremos(estados: Estados, consumidor: Consumidor) {
 }
 
 @Composable
-private fun DialogoConfirmarEjecucionAhora(estados: Estados, consumidor: Consumidor) {
+private fun DialogoConfirmarEjecucionAhora(estados: EstadoNoche, consumidor: ConsumidorNoche) {
     val confirmarEjecutarEvento by remember { estados.confirmarEjecutarEvento }
 
     confirmarEjecutarEvento?.let { evento ->
@@ -184,29 +203,30 @@ private fun DialogoConfirmarEjecucionAhora(estados: Estados, consumidor: Consumi
 }
 
 @Composable
-private fun SeccionEvento(estados: Estados, consumidor: Consumidor) {
-    val eventoSeleccionado by remember { estados.eventoSeleccionado }
-    val mostrarDialogo by remember { estados.mostrarDialogoSeleccionManualEvento }
-    val yaSeHaRealizado by remember { estados.yaSeHaRealizado }
+private fun SeccionEvento(estado: EstadoNoche, consumidor: ConsumidorNoche) {
+    val eventoSeleccionado by remember { estado.eventoSeleccionado }
+    val mostrarDialogo by remember { estado.mostrarDialogoSeleccionManualEvento }
+    val yaSeHaRealizado by remember { estado.yaSeHaRealizado }
 
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+    Seccion(
+        cabecera = {
             Titulo("Evento")
             if (yaSeHaRealizado) {
                 AdelaidaText("Ya realizado", Modifier.padding(start = 10.dp))
             }
-        }
-        TituloEventoYBotones(estados, consumidor, eventoSeleccionado, yaSeHaRealizado)
-        DialogoEventos(estados, consumidor, mostrarDialogo.mostrar, eventoSeleccionado, mostrarDialogo.ultimoEventoVisto)
-        DialogoRealizacionEvento(estados, consumidor)
-    }
+        },
+        contenido = { TituloEventoYBotones(estado, consumidor, eventoSeleccionado, yaSeHaRealizado) }
+    )
+
+    DialogoEventos(estado, consumidor, mostrarDialogo.mostrar, eventoSeleccionado, mostrarDialogo.ultimoEventoVisto)
+    DialogoRealizacionEvento(estado, consumidor)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TituloEventoYBotones(
-    estados: Estados,
-    consumidor: Consumidor,
+    estado: EstadoNoche,
+    consumidor: ConsumidorNoche,
     eventoSeleccionado: EventoVO?,
     yaSeHaRealizado: Boolean,
 ) {
@@ -251,8 +271,8 @@ private fun TituloEventoYBotones(
 
 @Composable
 private fun DialogoEventos(
-    estados: Estados,
-    consumidor: Consumidor,
+    estados: EstadoNoche,
+    consumidor: ConsumidorNoche,
     mostrarDialogo: Boolean,
     eventoSeleccionado: EventoVO?,
     ultimoVisto: EventoVO?,
@@ -261,7 +281,7 @@ private fun DialogoEventos(
 
     if (mostrarDialogo) {
         val dismiss: (EventoVO) -> Unit = {
-            consumidor.consumir(Intencion.CerrarDialogoSeleccionManualEventos(it))
+            consumidor.consumir(IntencionNoche.CerrarDialogoSeleccionManualEventos(it))
         }
 
         AdelaidaDialog(
@@ -275,29 +295,134 @@ private fun DialogoEventos(
 }
 
 @Composable
-private fun SeccionVisitaAdelaida() {
-    Column {
-        Titulo("Adelaida")
-        Row(Modifier.padding(bottom = MargenEstandar), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            AdelaidaText("Rosita aún tiene que ser visitada por Adelaida", Modifier.weight(1f))
-            AdelaidaButton({}) {
-                AdelaidaText("VISITAR")
+private fun SeccionVisitaAdelaida(estado: EstadoNoche, consumidor: ConsumidorNoche) {
+    val visitas by remember { estado.visitaAdelaida }
+
+    Seccion(
+        {
+            Titulo("Adelaida")
+
+            if (visitas is InfoVisita.Cargando) {
+                CircularProgressIndicator(Modifier
+                    .size(30.dp)
+                    .padding(start = 8.dp), Color.White)
             }
+        },
+        {
+            when (visitas) {
+                InfoVisita.Cargando -> { /* No mostrar nada mientras carga. */ }
+                InfoVisita.NadieParaVisitar -> { AdelaidaText(R.string.nadie_a_quien_visitar.get()) }
+                is InfoVisita.Info -> {
+                    (visitas as InfoVisita.Info).list.forEach { info ->
+                        Row(
+                            Modifier.padding(6.dp),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Box(Modifier.weight(1f)) {
+                                val nombreNegrita = AnnotatedString.Range(
+                                    SpanStyle(fontWeight = FontWeight.Bold), 0, info.jugador.nombre.length
+                                )
+                                AdelaidaText(getMensajeVisita(info), spans = listOf(nombreNegrita))
+                            }
+
+                            if (info.validaciones.run()) {
+                                Box {
+                                    AdelaidaButton({ consumidor.consumir(IntencionNoche.Visitar(info.jugador)) }) {
+                                        AdelaidaText("VISITAR")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+}
+
+@Composable
+private fun getMensajeVisita(infoJugador: InfoVisita.Jugador): String {
+    val puedeSerVisitado = infoJugador.validaciones.run()
+    val mensaje: String = if (puedeSerVisitado) {
+        "${infoJugador.jugador.nombre} tiene que ser visitado."
+    } else {
+        val fallidas = infoJugador.validaciones.filter { !it.validar() }
+        val fallidasFinales = if (fallidas.any { it is ValidacionVisita.NoTieneElPerseskud }) {
+            fallidas.filter { it is ValidacionVisita.NoTieneElPerseskud }
+        } else {
+            fallidas
         }
+        fallidasFinales.map { visita ->
+            when (visita) {
+                is ValidacionVisita.TieneUnSecretoNuevo ->
+                    R.string.jugador_sin_secretos_nuevos.get()
+
+                is ValidacionVisita.TieneSuficientesCartas ->
+                    R.string.jugador_sin_cartas_suficientes_para_visita.get()
+
+                is ValidacionVisita.NoTieneElPerseskud ->
+                    R.string.jugador_con_perseskud.get()
+            }
+        }.let { mensajes ->
+            val append = if (mensajes.hasAtLeast(2)) {
+                val listaRazones = mensajes.joinToString(separator = "") {
+                    "\n  - ${it.capitalize(Locale.current)}."
+                }
+                ":$listaRazones"
+            } else {
+                " ${mensajes[0]}."
+            }
+            "${infoJugador.jugador.nombre} no puede ser visitado porque$append"
+        }
+    }
+
+    return mensaje
+}
+
+@Composable
+private fun Seccion(
+    cabecera: @Composable RowScope.() -> Unit,
+    contenido: @Composable ColumnScope.() -> Unit,
+) {
+    Column(Modifier
+        .fillMaxWidth()
+        .padding(vertical = 6.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, content = cabecera)
+        contenido()
     }
 }
 
 @Composable
-@Preview
+@NightAndDay
 private fun PreviewScreenNoche() {
     val eventos = eventosVo(7)
     val seleccionado = eventos[2]
+    val jugadores = listOf(
+        jugador("Secreto nuevo", pistas = mutableListOf(ElementoTablero.Pista.Secreto(2))),
+        jugador(
+            "Secreto nuevo pero sin cartas",
+            pistas = mutableListOf(ElementoTablero.Pista.Secreto(2)),
+            cartas = mutableListOf()
+        ),
+        jugador("Perseskud", cartas = mutableListOf(ElementoTablero.Carta.Perseskud())),
+        jugador(
+            "Sin secreto nuevo",
+            pistas = mutableListOf(),
+            cartas = mutableListOf(
+                ElementoTablero.Carta.Dinero(2, 1000),
+                ElementoTablero.Carta.Dinero(3, 1000),
+            )
+        )
+    )
 
-    ScreenPreviewMarron {
-        ScreenNoche(
-            Estados(
-                eventos = Estados.Estado.Eventos(eventos),
-                eventoSeleccionado = Estados.Estado.EventoSeleccionado(seleccionado)
+    ScreenPreviewVerde {
+        Screen(
+            EstadoNoche(
+                eventos = EstadoNoche.Estado.Eventos(eventos),
+                eventoSeleccionado = EstadoNoche.Estado.EventoSeleccionado(seleccionado),
+                jugadores = EstadoNoche.Estado.Jugadores(jugadores),
+                visitaAdelaidaInfo = EstadoNoche.Estado.VisitasAdelaida(
+                    InfoVisita.Info(jugadores.map { InfoVisita.Jugador(it, puedeSerVisitado(it)) })
+                )
             ),
             Consumidor.Dummy,
             7L,
@@ -306,34 +431,10 @@ private fun PreviewScreenNoche() {
     }
 }
 
-@NightAndDay
-@Composable
-private fun EventosVerde() {
-    val eventos = eventosVo(3)
-    PreviewComponente {
-        SeccionEvento(
-            Estados(
-                eventos = Estados.Estado.Eventos(eventos),
-                eventoSeleccionado = Estados.Estado.EventoSeleccionado(eventos[1]),
-                mostrarDialogoSeleccionManualEvento = Estados.Estado.MostrarDialogoSeleccionManualEvento(false, null),
-            ),
-            Consumidor.Dummy,
-        )
-    }
-}
-
-@NightAndDay
-@Composable
-private fun Visita() {
-    PreviewComponente {
-        SeccionVisitaAdelaida()
-    }
-}
-
 @Composable
 @NightAndDay
-private fun P3() {
-    PreviewComponente {
+private fun PreviewDialogoRealizacion() {
+    PreviewFondo {
         val evento = eventos(1)[0]
         val jugadores = jugadores("Esaul", "Loberto", "Loreal", "Garnier", "Rosabella")
             .mapIndexed { index, jugador -> JugadorVO(jugador, index % 2 == 0) }
@@ -341,15 +442,8 @@ private fun P3() {
 
 
         DialogoRealizacionEvento(
-            Estados(eventoRealizandose = Estados.Estado.EventoRealizandose(eventoRealizandose)),
+            EstadoNoche(eventoRealizandose = EstadoNoche.Estado.EventoRealizandose(eventoRealizandose)),
             Consumidor.Dummy,
         )
     }
 }
-
-class EstadoBaremos(
-    val jugador: Jugador,
-    val baremoSeleccionado: Baremo?,
-    val baremos: List<Baremo>,
-    val baremosNoSeleccionables: List<Baremo>
-)

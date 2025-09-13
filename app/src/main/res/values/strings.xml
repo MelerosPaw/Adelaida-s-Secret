@@ -49,11 +49,15 @@
     <string name="realizar_evento">REALIZAR</string>
     <string name="seleccion_manual">SELECCIÓN MANUAL</string>
     <string name="aleatorio">ALEATORIO</string>
-    <string name="jugador_sin_secretos_nuevos">El jugador no tiene ningún secreto nuevo</string>
-    <string name="jugador_sin_cartas_suficientes_para_visita">El jugador no tiene suficientes cartas para ser visitado</string>
-    <string name="jugador_con_perseskud">El jugador no puede ser visitado porque tiene el Perseskud</string>
+    <string name="jugador_sin_secretos_nuevos">no tiene ningún secreto nuevo</string>
+    <string name="jugador_sin_cartas_suficientes_para_visita">no tiene suficientes cartas para ser visitado</string>
+    <string name="jugador_con_perseskud">tiene el Perseskud</string>
     <string name="adelaida_debe_visitar_a">Adelaida debe visitar a %1$s</string>
     <!-- endregion-->
+
+    <!--region Sección visitas -->
+    <string name="nadie_a_quien_visitar">No hay nadie a quien visitar.</string>
+    <!--endregion-->
 
     <!-- region Validaciones cambio ronda -->
     <plurals name="jugadores_con_mas_pistas_de_las_debidas">

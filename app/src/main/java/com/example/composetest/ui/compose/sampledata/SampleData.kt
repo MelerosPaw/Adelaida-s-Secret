@@ -13,7 +13,6 @@ import com.example.composetest.model.Secreto
 import com.example.composetest.model.Sospechoso
 import com.example.composetest.model.Sospechoso.Genero
 import com.example.composetest.model.Tablero
-import com.example.composetest.model.elementosJuego
 import com.example.composetest.ui.compose.widget.EventoVO
 import kotlin.random.Random
 
@@ -42,16 +41,23 @@ private fun listaLlena(cuantas: Int) = Array(cuantas) {
 
 fun nombres(): Array<String> = arrayOf("Eufrasio", "Atanasio", "Romualdo", "Ataulfo", "Balaustrado")
 
-fun jugadores(vararg nombres: String = nombres()): List<Jugador> =
-    nombres.map {
-        Jugador(
-            it,
-            cartas = cartas(),
-            pistas = pistas(),
-            200,
-            "B${Random.nextInt(36) + 1}"
-        )
-    }
+fun jugador(
+    nombre: String,
+    cartas: MutableList<ElementoTablero.Carta> = cartas(),
+    pistas: MutableList<ElementoTablero.Pista> = pistas(),
+    idsSecretosRevelados: List<String> = emptyList(),
+    idsSecretosReveladosRonda: List<String> = emptyList(),
+): Jugador = Jugador(
+    nombre = nombre,
+    cartas = cartas,
+    pistas = pistas,
+    dinero = 200,
+    idBaremo = "B${Random.nextInt(36) + 1}",
+    idsSecretosRevelados = idsSecretosRevelados,
+    idsSecretosReveladosRonda = idsSecretosReveladosRonda
+)
+
+fun jugadores(vararg nombres: String = nombres()): List<Jugador> = nombres.map { jugador(it) }
 
 // endregion
 
@@ -59,7 +65,7 @@ fun cartas(): MutableList<ElementoTablero.Carta> = mutableListOf(
     ElementoTablero.Carta.Dinero(1, 1000),
     ElementoTablero.Carta.Dinero(2, 500, true),
     ElementoTablero.Carta.Brandy(2, true),
-    ElementoTablero.Carta.Perseskud()
+    ElementoTablero.Carta.Llave(2)
 )
 
 fun pistas(): MutableList<ElementoTablero.Pista> = mutableStateListOf(

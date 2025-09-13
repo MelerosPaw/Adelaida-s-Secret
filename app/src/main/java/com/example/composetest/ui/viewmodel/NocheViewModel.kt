@@ -16,16 +16,17 @@ import com.example.composetest.model.Evento
 import com.example.composetest.model.Jugador
 import com.example.composetest.model.Partida
 import com.example.composetest.ui.compose.navegacion.Mensaje
-import com.example.composetest.ui.compose.screen.EstadoBaremos
 import com.example.composetest.ui.compose.widget.EventoVO
-import com.example.composetest.ui.contracts.Consumidor
-import com.example.composetest.ui.contracts.Intencion
+import com.example.composetest.ui.contracts.ConsumidorNoche
+import com.example.composetest.ui.contracts.IntencionNoche
 import com.example.composetest.ui.manager.ComprobadorNombreRepetido
 import com.example.composetest.ui.manager.GestorRonda
-import com.example.composetest.ui.viewmodel.Estados.Estado.ConfirmarEjecutarEvento
-import com.example.composetest.ui.viewmodel.Estados.Estado.Eventos
-import com.example.composetest.ui.viewmodel.Estados.Estado.Jugadores
-import com.example.composetest.ui.viewmodel.Estados.Estado.MostrarDialogoSeleccionManualEvento
+import com.example.composetest.ui.manager.InfoVisita
+import com.example.composetest.ui.manager.puedeSerVisitado
+import com.example.composetest.ui.viewmodel.EstadoNoche.Estado.ConfirmarEjecutarEvento
+import com.example.composetest.ui.viewmodel.EstadoNoche.Estado.Eventos
+import com.example.composetest.ui.viewmodel.EstadoNoche.Estado.Jugadores
+import com.example.composetest.ui.viewmodel.EstadoNoche.Estado.MostrarDialogoSeleccionManualEvento
 import com.example.composetest.ui.viewmodel.NocheViewModel.EventoRealizandose
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -50,24 +51,25 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
   private var cambioRondaSolicitado: Boolean = false
   private var onCondicionesCambioRondaSatisfechas: ((Boolean) -> Unit)? = null
 
-  val estados: Estados = Estados()
-  val consumidor: Consumidor = object: Consumidor {
-    override fun consumir(vararg intenciones: Intencion) {
+  val estados: EstadoNoche = EstadoNoche()
+  val consumidor: ConsumidorNoche = object: ConsumidorNoche {
+    override fun consumir(vararg intenciones: IntencionNoche) {
       intenciones.forEach { intencion ->
         when (intencion) {
-          is Intencion.AbrirDialogoBaremos -> onAbrirBaremo(intencion.jugador)
-          is Intencion.CerrarBaremo -> onCerrarBaremo()
-          is Intencion.GuardarBaremo -> partida?.id?.let { guardarBaremo(intencion.jugador, it, intencion.baremo) }
-          is Intencion.SeleccionarEvento -> onEventoSeleccionado(intencion.evento)
-          is Intencion.CerrarDialogoSeleccionManualEventos -> cerrarSelectorEventoManual(intencion.ultimoEventoVisualizado)
-          is Intencion.AbrirDialogoSeleccionManualEventos -> mostrarSelectorEventoManual()
-          is Intencion.MostrarMensaje -> mostrarMensaje(intencion.mensaje)
-          is Intencion.RealizarEventoSeleccionado -> onRealizarEventoSeleccionado(intencion.evento)
-          is Intencion.CerrarRealizacionEvento -> onCancelarRealizacionEvento()
-          is Intencion.SeleccionarEventoAleatorio -> onEventoAleatorio()
-          is Intencion.OcultarDialogoEjecucionEvento -> ocultarConfirmacionEjecutarEvento()
-          is Intencion.MarcarGanadorEvento -> onJugadorSeleccionado(intencion.seleccionado, intencion.jugador)
-          is Intencion.DarEventoPorRealizado -> onEventoRealizado(intencion.evento)
+          is IntencionNoche.AbrirDialogoBaremos -> onAbrirBaremo(intencion.jugador)
+          is IntencionNoche.CerrarBaremo -> onCerrarBaremo()
+          is IntencionNoche.GuardarBaremo -> partida?.id?.let { guardarBaremo(intencion.jugador, it, intencion.baremo) }
+          is IntencionNoche.SeleccionarEvento -> onEventoSeleccionado(intencion.evento)
+          is IntencionNoche.CerrarDialogoSeleccionManualEventos -> cerrarSelectorEventoManual(intencion.ultimoEventoVisualizado)
+          is IntencionNoche.AbrirDialogoSeleccionManualEventos -> mostrarSelectorEventoManual()
+          is IntencionNoche.MostrarMensaje -> mostrarMensaje(intencion.mensaje)
+          is IntencionNoche.RealizarEventoSeleccionado -> onRealizarEventoSeleccionado(intencion.evento)
+          is IntencionNoche.CerrarRealizacionEvento -> onCancelarRealizacionEvento()
+          is IntencionNoche.SeleccionarEventoAleatorio -> onEventoAleatorio()
+          is IntencionNoche.OcultarDialogoEjecucionEvento -> ocultarConfirmacionEjecutarEvento()
+          is IntencionNoche.MarcarGanadorEvento -> onJugadorSeleccionado(intencion.seleccionado, intencion.jugador)
+          is IntencionNoche.DarEventoPorRealizado -> onEventoRealizado(intencion.evento)
+          is IntencionNoche.Visitar -> { onVisitando(intencion.jugador) }
         }
       }
     }
@@ -86,6 +88,7 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
       estados.set(Jugadores(it.jugadores.toList()))
       inicializarEventos(it.eventosConsumidos)
       this.onCondicionesCambioRondaSatisfechas = onCondicionesCambioRondaSatisfechas
+      inicializarVisitas(it.jugadores)
     }
 
     if (!cambioRondaSolicitado) {
@@ -108,12 +111,12 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
         ?.idBaremo
         ?.let(Baremo::empty)
     }
-    estados.set(Estados.Estado.EstadoDialogoBaremos(
+    estados.set(EstadoNoche.Estado.EstadoDialogoBaremos(
       EstadoBaremos(jugador, baremoDelJugador, baremos, baremosDeLosDemas)))
   }
 
   fun onCerrarBaremo() {
-    estados.set(Estados.Estado.EstadoDialogoBaremos(null))
+    estados.set(EstadoNoche.Estado.EstadoDialogoBaremos(null))
   }
 
   fun guardarBaremo(jugador: Jugador, idPartida: Long, baremoSeleccionado: Baremo) {
@@ -123,32 +126,6 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
         .invoke(parametros)
         .usarRespuesta { onCerrarBaremo() }
     }
-  }
-
-  private fun inicializarEventos(eventosConsumidos: Set<Evento>) {
-    if (estados.eventos.value.isEmpty()) {
-      cargarListaEventos(eventosConsumidos)
-    } else {
-      pintarEventoSeleccionadoYEstadoRealizacion()
-    }
-  }
-
-  private fun cargarListaEventos(eventosConsumidos: Set<Evento>) {
-    suspender {
-      obtenerEventosUC.get()
-        .invoke(ObtenerEventosUC.Parametros())
-        .usarRespuesta {
-          setListaEventos(it, eventosConsumidos)
-          pintarEventoSeleccionadoYEstadoRealizacion()
-        }
-    }
-  }
-
-  private fun pintarEventoSeleccionadoYEstadoRealizacion() {
-    setEventoSeleccionado()
-    // TODO Melero: 17/4/25 Ver en el flow cuándo cambia de true a false cuando realizo el evento
-    setEventoYaRealizado()
-    // TODO Melero: 17/4/25 Justo en el paso anterior, antes de cambiar de ronda, hay que poner esto a false.
   }
 
   fun cerrarSelectorEventoManual(ultimoEventoVisto: EventoVO?) {
@@ -169,7 +146,7 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
 
   fun onEventoSeleccionado(evento: EventoVO, preguntarSiSeQuiereEjecutarTrasSeleccionar: Boolean = true) {
     val eventoSeleccionadoActual = estados.eventoSeleccionado.value
-    estados.set(Estados.Estado.EventoSeleccionado(evento))
+    estados.set(EstadoNoche.Estado.EventoSeleccionado(evento))
 
     suspender {
       partida?.let {
@@ -186,7 +163,7 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
   }
 
   fun onCancelarRealizacionEvento() {
-    estados.set(Estados.Estado.EventoRealizandose(null))
+    estados.set(EstadoNoche.Estado.EventoRealizandose(null))
   }
 
   fun onRealizarEventoSeleccionado(evento: EventoVO) {
@@ -194,7 +171,7 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
       val eventoRealizandose = EventoRealizandose(evento.evento, jugadores,
         sePuedenSeleccionarMasGanadores(jugadores, evento.evento)
       )
-      estados.set(Estados.Estado.EventoRealizandose(eventoRealizandose))
+      estados.set(EstadoNoche.Estado.EventoRealizandose(eventoRealizandose))
   }
 
   fun ocultarConfirmacionEjecutarEvento() {
@@ -211,7 +188,7 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
         jugadores = jugadores,
         puedeSeleccionarMasJugadores = puedeSeleccionarMasJugadores
       )
-      estados.set(Estados.Estado.EventoRealizandose(eventoActualizado))
+      estados.set(EstadoNoche.Estado.EventoRealizandose(eventoActualizado))
     }
   }
 
@@ -263,6 +240,32 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
     }
   }
 
+  private fun inicializarEventos(eventosConsumidos: Set<Evento>) {
+    if (estados.eventos.value.isEmpty()) {
+      cargarListaEventos(eventosConsumidos)
+    } else {
+      pintarEventoSeleccionadoYEstadoRealizacion()
+    }
+  }
+
+  private fun cargarListaEventos(eventosConsumidos: Set<Evento>) {
+    suspender {
+      obtenerEventosUC.get()
+        .invoke(ObtenerEventosUC.Parametros())
+        .usarRespuesta {
+          setListaEventos(it, eventosConsumidos)
+          pintarEventoSeleccionadoYEstadoRealizacion()
+        }
+    }
+  }
+
+  private fun pintarEventoSeleccionadoYEstadoRealizacion() {
+    setEventoSeleccionado()
+    // TODO Melero: 17/4/25 Ver en el flow cuándo cambia de true a false cuando realizo el evento
+    setEventoYaRealizado()
+    // TODO Melero: 17/4/25 Justo en el paso anterior, antes de cambiar de ronda, hay que poner esto a false.
+  }
+
   private fun setListaEventos(
     eventos: List<Evento>,
     eventosConsumidos: Set<Evento>
@@ -277,7 +280,7 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
   }
 
   private fun setEventoSeleccionado() {
-    estados.set(Estados.Estado.EventoSeleccionado(partida?.eventoActual?.let {
+    estados.set(EstadoNoche.Estado.EventoSeleccionado(partida?.eventoActual?.let {
       EventoVO(
         evento = it,
         seleccionable = true,
@@ -287,7 +290,28 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
   }
 
   private fun setEventoYaRealizado() {
-    estados.set(Estados.Estado.YaSeHaRealizado(partida?.eventoActualEjecutado == true))
+    estados.set(EstadoNoche.Estado.YaSeHaRealizado(partida?.eventoActualEjecutado == true))
+  }
+
+  private fun inicializarVisitas(jugadores: Array<Jugador>) {
+    suspender {
+      val infos = jugadores.map {
+        val validaciones = puedeSerVisitado(it)
+        InfoVisita.Jugador(it, validaciones)
+      }
+
+      val visitas = if (infos.isEmpty()) {
+        InfoVisita.NadieParaVisitar
+      } else {
+        InfoVisita.Info(infos)
+      }
+
+      estados.set(EstadoNoche.Estado.VisitasAdelaida(visitas))
+    }
+  }
+
+  private fun onVisitando(jugador: Jugador) {
+//    estados.set(EstadoNoche.Estado.Visitando(jugador))
   }
   //endregion
 
@@ -303,7 +327,7 @@ class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle)
   )
 }
 
-class Estados(
+class EstadoNoche(
   jugadores: Jugadores = Jugadores(emptyList()),
   estadoDialogoBaremos: Estado.EstadoDialogoBaremos = Estado.EstadoDialogoBaremos(null),
   eventos: Eventos = Eventos(emptyList()),
@@ -312,6 +336,7 @@ class Estados(
   confirmarEjecutarEvento: ConfirmarEjecutarEvento = ConfirmarEjecutarEvento(null),
   eventoRealizandose: Estado.EventoRealizandose = Estado.EventoRealizandose(null),
   yaSeHaRealizado: Estado.YaSeHaRealizado = Estado.YaSeHaRealizado(false),
+  visitaAdelaidaInfo: Estado.VisitasAdelaida = Estado.VisitasAdelaida(InfoVisita.Cargando)
 ) {
 
   private val _jugadores: MutableState<List<Jugador>> = mutableStateOf(jugadores.jugadores)
@@ -322,6 +347,7 @@ class Estados(
   private val _confirmarEjecutarEvento: MutableState<EventoVO?> = mutableStateOf(confirmarEjecutarEvento.evento)
   private val _eventoRealizandose: MutableState<EventoRealizandose?> = mutableStateOf(eventoRealizandose.evento)
   private val _yaSeHaRealizado: MutableState<Boolean> = mutableStateOf(yaSeHaRealizado.realizado)
+  private val _visitasAdelaida: MutableState<InfoVisita> = mutableStateOf(visitaAdelaidaInfo.info)
 
   val jugadores: State<List<Jugador>> = _jugadores
   val estadoDialogoBaremos: State<EstadoBaremos?> = _estadoDialogoBaremos
@@ -331,6 +357,7 @@ class Estados(
   val confirmarEjecutarEvento: State<EventoVO?> = _confirmarEjecutarEvento
   val eventoRealizandose: State<EventoRealizandose?> = _eventoRealizandose
   val yaSeHaRealizado: State<Boolean> = _yaSeHaRealizado
+  val visitaAdelaida: State<InfoVisita> = _visitasAdelaida
 
   fun set(estado: Estado) {
     estado.set(this)
@@ -338,47 +365,59 @@ class Estados(
 
   sealed class Estado {
 
-    abstract fun set(estados: Estados)
+    abstract fun set(estados: EstadoNoche)
 
     class Jugadores(val jugadores: List<Jugador>): Estado() {
-      override fun set(estados: Estados) {
+      override fun set(estados: EstadoNoche) {
         estados._jugadores.value = jugadores
       }
     }
     class EstadoDialogoBaremos(val estadoBaremos: EstadoBaremos?): Estado() {
-      override fun set(estados: Estados) {
+      override fun set(estados: EstadoNoche) {
         estados._estadoDialogoBaremos.value = estadoBaremos
       }
     }
     class Eventos(val eventos: List<EventoVO>): Estado() {
-      override fun set(estados: Estados) {
+      override fun set(estados: EstadoNoche) {
         estados._eventos.value = eventos
       }
     }
     class EventoSeleccionado(val evento: EventoVO?): Estado() {
-      override fun set(estados: Estados) {
+      override fun set(estados: EstadoNoche) {
         estados._eventoSeleccionado.value = evento
       }
     }
     data class MostrarDialogoSeleccionManualEvento(val mostrar: Boolean, val ultimoEventoVisto: EventoVO?): Estado() {
-      override fun set(estados: Estados) {
+      override fun set(estados: EstadoNoche) {
         estados._mostrarDialogoSeleccionManualEvento.value = this
       }
     }
     class ConfirmarEjecutarEvento(val evento: EventoVO?): Estado() {
-      override fun set(estados: Estados) {
+      override fun set(estados: EstadoNoche) {
         estados._confirmarEjecutarEvento.value = evento
       }
     }
     class EventoRealizandose(val evento: NocheViewModel.EventoRealizandose?): Estado() {
-      override fun set(estados: Estados) {
+      override fun set(estados: EstadoNoche) {
         estados._eventoRealizandose.value = evento
       }
     }
     class YaSeHaRealizado(val realizado: Boolean): Estado() {
-      override fun set(estados: Estados) {
+      override fun set(estados: EstadoNoche) {
         estados._yaSeHaRealizado.value = realizado
+      }
+    }
+    class VisitasAdelaida(val info: InfoVisita): Estado() {
+      override fun set(estados: EstadoNoche) {
+        estados._visitasAdelaida.value = info
       }
     }
   }
 }
+
+class EstadoBaremos(
+  val jugador: Jugador,
+  val baremoSeleccionado: Baremo?,
+  val baremos: List<Baremo>,
+  val baremosNoSeleccionables: List<Baremo>
+)

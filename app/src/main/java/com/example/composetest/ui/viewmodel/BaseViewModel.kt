@@ -31,8 +31,6 @@ open class BaseViewModel: ViewModel() {
         }
     }
 
-    // TODO Melero: 26/11/24 Ahora que tenemos el componente de navegación, se puede poner a todas
-    //  las pantallas un listener para que muestre un cargando.
     fun mostrarMensaje(mensaje: Mensaje) {
         viewModelScope.launch(Dispatchers.Main) {
             when {

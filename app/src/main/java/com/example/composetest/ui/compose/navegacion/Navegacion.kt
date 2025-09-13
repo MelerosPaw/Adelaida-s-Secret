@@ -1,7 +1,6 @@
 package com.example.composetest.ui.compose.navegacion
 
 import android.app.Activity
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.RowScope
@@ -51,6 +50,7 @@ import com.example.composetest.ui.viewmodel.NavegacionViewModel
 import com.example.composetest.ui.viewmodel.NombrePartidaViewModel
 
 typealias PartidaModelo = com.example.composetest.model.Partida
+typealias JugadorModelo = com.example.composetest.model.Jugador
 typealias PartidaModeloCreacion = com.example.composetest.model.Partida.EstadoCreacion
 
 const val CLAVE_CARGA_INICIAL = "KEY_INITIAL_DATA"

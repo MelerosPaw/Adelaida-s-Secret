@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetest.model.Jugador
+import com.example.composetest.ui.PreviewSafeContent
 import com.example.composetest.ui.compose.modifiers.onLongClick
 import com.example.composetest.ui.compose.sampledata.jugadores
 import com.example.composetest.ui.compose.screen.ScreenPreviewMarron
@@ -24,6 +25,7 @@ import com.example.composetest.ui.compose.widget.dialog.AdelaidaTextFieldDialog
 import com.example.composetest.ui.viewmodel.CambioNombreJugadorViewModel
 import com.example.composetest.ui.viewmodel.CambioNombreJugadorViewModel.EstadoCambioNombre
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun NombreJugadorEditable(
     jugador: Jugador,
@@ -34,27 +36,37 @@ fun NombreJugadorEditable(
     nivelTitulo: NivelTitulo = NivelTitulo.Nivel2,
     textAlign: TextAlign = nivelTitulo.textAlign
 ) {
-    val viewModel: CambioNombreJugadorViewModel = hiltViewModel()
-    viewModel.inicializar(idPartida, onComprobarNombreRepetido)
+    PreviewSafeContent({
+        Component(
+            jugador,
+            {},
+            mutableStateOf(null),
+            {_, _ -> }, {}, {}
+        )
+    }) {
+        val viewModel: CambioNombreJugadorViewModel = hiltViewModel()
+        viewModel.inicializar(idPartida, onComprobarNombreRepetido)
 
-    NombreJugador(jugador,
-        {
-            onNombrePulsado?.invoke(jugador)
-            viewModel.mostrarDialogo(jugador)
-        },
-        viewModel.estadoDialogo,
-        viewModel::onCambioNombreEnDialogo,
-        viewModel::cerrarDialogo,
-        viewModel::cambiarNombre,
-        modifier,
-        nivelTitulo,
-        textAlign
-    )
+        Component(
+            jugador,
+            {
+                onNombrePulsado?.invoke(jugador)
+                viewModel.mostrarDialogo(jugador)
+            },
+            viewModel.estadoDialogo,
+            viewModel::onCambioNombreEnDialogo,
+            viewModel::cerrarDialogo,
+            viewModel::cambiarNombre,
+            modifier,
+            nivelTitulo,
+            textAlign
+        )
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun NombreJugador(
+private fun Component(
     jugador: Jugador,
     onNombrePulsado: (Jugador) -> Unit,
     estadoDialogo: State<EstadoCambioNombre?>,
@@ -114,7 +126,7 @@ private fun PreviewCambioNombre() {
         val jugador = jugadores("Pedrito")[0]
         val estado = EstadoCambioNombre(jugador, "Rafael")
 
-        NombreJugador(
+        Component(
             jugador,
             {},
             mutableStateOf(estado),

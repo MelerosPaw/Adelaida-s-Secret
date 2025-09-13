@@ -50,15 +50,6 @@ class GestorRondaNoche(
             is ValidacionCambioRondaNoche.NoHayVisitasPendientes ->
                 obtenerMensajeJugadoresPendientesDeSerVisitados(validacion, context)
 
-            is ValidacionVisita.TieneUnSecretoNuevo ->
-                context.getString(R.string.jugador_sin_secretos_nuevos)
-
-            is ValidacionVisita.TieneSuficientesCartas ->
-                context.getString(R.string.jugador_sin_cartas_suficientes_para_visita)
-
-            is ValidacionVisita.NoTieneElPerseskud ->
-                context.getString(R.string.jugador_con_perseskud)
-
             else -> super.obtenerMensajesDeValidacion(validacion, context)
         }
 

@@ -7,28 +7,33 @@ import com.example.composetest.ui.compose.widget.EventoVO
 import com.example.composetest.ui.viewmodel.NocheViewModel
 import com.example.composetest.ui.viewmodel.NocheViewModel.EventoRealizandose
 
-sealed class Intencion {
-  class AbrirDialogoBaremos(val jugador: Jugador): Intencion()
-  class CerrarBaremo(): Intencion()
-  class AbrirDialogoSeleccionManualEventos(): Intencion()
-  class CerrarDialogoSeleccionManualEventos(val ultimoEventoVisualizado: EventoVO): Intencion()
-  class MostrarMensaje(val mensaje: Mensaje): Intencion()
-  class SeleccionarEvento(val evento: EventoVO): Intencion()
-  class RealizarEventoSeleccionado(val evento: EventoVO): Intencion()
-  class CerrarRealizacionEvento(val evento: EventoRealizandose): Intencion()
-  class DarEventoPorRealizado(val evento: EventoRealizandose): Intencion()
-  class SeleccionarEventoAleatorio(): Intencion()
-  class GuardarBaremo(val jugador: Jugador, val baremo: Baremo): Intencion()
-  class OcultarDialogoEjecucionEvento(): Intencion()
-  class MarcarGanadorEvento(val seleccionado: Boolean, val jugador: NocheViewModel.JugadorVO): Intencion()
+sealed class IntencionNoche {
+  class AbrirDialogoBaremos(val jugador: Jugador): IntencionNoche()
+  class CerrarBaremo(): IntencionNoche()
+  class AbrirDialogoSeleccionManualEventos(): IntencionNoche()
+  class CerrarDialogoSeleccionManualEventos(val ultimoEventoVisualizado: EventoVO): IntencionNoche()
+  class MostrarMensaje(val mensaje: Mensaje): IntencionNoche()
+  class SeleccionarEvento(val evento: EventoVO): IntencionNoche()
+  class RealizarEventoSeleccionado(val evento: EventoVO): IntencionNoche()
+  class CerrarRealizacionEvento(val evento: EventoRealizandose): IntencionNoche()
+  class DarEventoPorRealizado(val evento: EventoRealizandose): IntencionNoche()
+  class SeleccionarEventoAleatorio(): IntencionNoche()
+  class GuardarBaremo(val jugador: Jugador, val baremo: Baremo): IntencionNoche()
+  class OcultarDialogoEjecucionEvento(): IntencionNoche()
+  class MarcarGanadorEvento(val seleccionado: Boolean, val jugador: NocheViewModel.JugadorVO): IntencionNoche()
+  class Visitar(val jugador: Jugador): IntencionNoche()
 }
 
-fun interface Consumidor {
+fun interface ConsumidorNoche: Consumidor<IntencionNoche> {
 
-  fun consumir(vararg intenciones: Intencion)
+}
 
-  object Dummy: Consumidor {
-    override fun consumir(vararg intenciones: Intencion) {
+fun interface Consumidor<INTENT> {
+
+  fun consumir(vararg intenciones: INTENT)
+
+  object Dummy: ConsumidorNoche {
+    override fun consumir(vararg intenciones: IntencionNoche) {
       // Función dummy para previews
     }
   }
