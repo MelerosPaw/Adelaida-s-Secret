@@ -75,7 +75,6 @@ import com.example.composetest.ui.contracts.IntencionNoche.SeleccionarEventoAlea
 import com.example.composetest.ui.manager.InfoVisita
 import com.example.composetest.ui.manager.ValidacionVisita
 import com.example.composetest.ui.manager.puedeSerVisitado
-import com.example.composetest.ui.manager.run
 import com.example.composetest.ui.viewmodel.EstadoNoche
 import com.example.composetest.ui.viewmodel.NocheViewModel
 import com.example.composetest.ui.viewmodel.NocheViewModel.EventoRealizandose
@@ -325,7 +324,7 @@ private fun SeccionVisitaAdelaida(estado: EstadoNoche, consumidor: ConsumidorNoc
                                 AdelaidaText(getMensajeVisita(info), spans = listOf(nombreNegrita))
                             }
 
-                            if (info.validaciones.run()) {
+                            if (info.validador.valida) {
                                 Box {
                                     AdelaidaButton({ consumidor.consumir(IntencionNoche.Visitar(info.jugador)) }) {
                                         AdelaidaText("VISITAR")
@@ -341,11 +340,11 @@ private fun SeccionVisitaAdelaida(estado: EstadoNoche, consumidor: ConsumidorNoc
 
 @Composable
 private fun getMensajeVisita(infoJugador: InfoVisita.Jugador): String {
-    val puedeSerVisitado = infoJugador.validaciones.run()
+    val puedeSerVisitado = infoJugador.validador.valida
     val mensaje: String = if (puedeSerVisitado) {
         "${infoJugador.jugador.nombre} tiene que ser visitado."
     } else {
-        val fallidas = infoJugador.validaciones.filter { !it.validar() }
+        val fallidas = infoJugador.validador.validaciones.filter { !it.validar() }
         val fallidasFinales = if (fallidas.any { it is ValidacionVisita.NoTieneElPerseskud }) {
             fallidas.filter { it is ValidacionVisita.NoTieneElPerseskud }
         } else {

@@ -79,21 +79,21 @@ interface GestorRonda {
     fun sePuedeCambiarDeRonda(partida: Partida, context: Context): Boolean {
         val validacionesComunes = validacionesComunes(partida)
 
-        if (!validacionesComunes.run()) {
+        if (!validacionesComunes.valida) {
             mostrarMensajeSiNoEsValido(validacionesComunes, context)
         }
-        return validacionesComunes.run()
+        return validacionesComunes.valida
     }
 
-    fun validacionesComunes(partida: Partida): List<Validacion> {
+    fun validacionesComunes(partida: Partida): Validador<ValidacionCambioRonda> {
         val limitePistas = ValidacionCambioRonda.NadieRebasaElLimiteDePistas(partida)
         val okWithEvent = ValidacionCambioRonda.EventoYaRalizadoONoTocaAhora(partida,
             ::seEjecutaAhora, ::hayQueSeleccionarEventoNuevo)
-        return listOf(limitePistas, okWithEvent)
+        return Validador(listOf(limitePistas, okWithEvent))
     }
 
-    fun mostrarMensajeSiNoEsValido(validaciones: List<Validacion>, context: Context) {
-        val mensajeFormateado: String? = validaciones
+    fun mostrarMensajeSiNoEsValido(validador: Validador<*>, context: Context) {
+        val mensajeFormateado: String? = validador.validaciones
             .filter { !it.validar() }
             .mapNotNull { obtenerMensajesDeValidacion(it, context) }
             .joinToString("\n") { "\t- $it" }

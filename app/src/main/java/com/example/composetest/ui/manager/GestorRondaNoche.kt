@@ -31,15 +31,13 @@ class GestorRondaNoche(
         val validacionesComunes = validacionesComunes(partida)
         val todosTienenBaremo = ValidacionCambioRondaNoche.TodosLosJugadoresTienenBaremo(partida.jugadores.toList())
         val visitasPendientes = ValidacionCambioRondaNoche.NoHayVisitasPendientes(partida)
-        val validacionCompleta = (validacionesComunes + todosTienenBaremo + visitasPendientes)
+        val validacionCompleta = validacionesComunes and todosTienenBaremo and visitasPendientes
 
-        val sePuede = validacionCompleta.run()
-
-        if (!sePuede) {
+        if (!validacionCompleta.valida) {
             mostrarMensajeSiNoEsValido(validacionCompleta, context)
         }
 
-        return sePuede
+        return validacionCompleta.valida
     }
 
     override fun obtenerMensajesDeValidacion(validacion: Validacion, context: Context): String? =
@@ -75,17 +73,17 @@ class GestorRondaNoche(
         R.string.adelaida_debe_visitar_a,
         pendientes.jugadoresVisitables.joinToStringHumanReadable { it.nombre })
 
-    sealed class ValidacionCambioRondaNoche(): Validacion {
-        class TodosLosJugadoresTienenBaremo(jugadores: List<Jugador>): Validacion {
+    sealed class ValidacionCambioRondaNoche(): GestorRonda.ValidacionCambioRonda() {
+        class TodosLosJugadoresTienenBaremo(jugadores: List<Jugador>): ValidacionCambioRondaNoche() {
 
             val jugadoresSinBaremo = jugadores.filter { it.idBaremo == null }
 
             override fun validar(): Boolean = jugadoresSinBaremo.isEmpty()
         }
 
-        class NoHayVisitasPendientes(partida: Partida): Validacion {
+        class NoHayVisitasPendientes(partida: Partida): ValidacionCambioRondaNoche() {
 
-            val jugadoresVisitables = partida.jugadores.filter { puedeSerVisitado(it).run() }
+            val jugadoresVisitables = partida.jugadores.filter { puedeSerVisitado(it).valida }
 
             override fun validar(): Boolean = jugadoresVisitables.isEmpty()
         }

@@ -65,6 +65,7 @@ fun AdelaidaText(
         fontFamily = fontFamily,
         textAlign = textAlign,
         overflow = TextOverflow.Clip,
+        lineHeight = fontSize
     )
 }
 

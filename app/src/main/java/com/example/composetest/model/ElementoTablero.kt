@@ -14,8 +14,6 @@ private val cartasSinAcciones: Array<ElementoTablero.Prefijo> = arrayOf(
 )
 
 const val iconoDinero: String = "🪙"
-const val MONEDAS_EN_PISTA = 100
-const val MONEDAS_EN_PISTA_FALSA = 200
 
 /**
  * @property prefijo La primera letra del identificador del tipo de elemento.

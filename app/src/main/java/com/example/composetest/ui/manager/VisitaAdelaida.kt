@@ -1,26 +1,30 @@
 package com.example.composetest.ui.manager
 
+import com.example.composetest.model.CARTAS_NECESARIAS_PARA_SER_VISITADO
 import com.example.composetest.model.ElementoTablero
 import com.example.composetest.model.Jugador
 import com.example.composetest.ui.compose.navegacion.JugadorModelo
 
-const val CARTAS_NECESARIAS_PARA_SER_VISITADO = 2
-
-fun puedeSerVisitado(jugador: Jugador) : List<ValidacionVisita> = listOf(
-  ValidacionVisita.TieneUnSecretoNuevo(jugador),
-  ValidacionVisita.TieneSuficientesCartas(jugador),
-  ValidacionVisita.NoTieneElPerseskud(jugador)
+fun puedeSerVisitado(jugador: Jugador): Validador<ValidacionVisita> = Validador(
+  listOf(
+    ValidacionVisita.TieneUnSecretoNuevo(jugador),
+    ValidacionVisita.TieneSuficientesCartas(jugador),
+    ValidacionVisita.NoTieneElPerseskud(jugador)
+  )
 )
 
+/** ¿Debe ser visitado? */
 sealed class ValidacionVisita(): Validacion {
 
+  /** Tiene un secreto nuevo. */
   class TieneUnSecretoNuevo(jugador: Jugador): ValidacionVisita() {
 
     val result by lazy { jugador.tienePistasPorLasQueAunNoHaSidoVisitado() }
 
     override fun validar(): Boolean = result
   }
-  
+
+  /** Tiene más de [com.example.composetest.model.CARTAS_NECESARIAS_PARA_SER_VISITADO]. */
   class TieneSuficientesCartas(jugador: Jugador): ValidacionVisita() {
 
     val result by lazy { jugador.tieneSuficientesCartas(CARTAS_NECESARIAS_PARA_SER_VISITADO) }
@@ -28,6 +32,7 @@ sealed class ValidacionVisita(): Validacion {
     override fun validar(): Boolean = result
   }
 
+  /** No tener la carta Perseskud. */
   class NoTieneElPerseskud(jugador: Jugador): ValidacionVisita() {
 
     val result by lazy { !jugador.tieneCarta(ElementoTablero.Carta.Perseskud()) }
@@ -41,5 +46,5 @@ sealed class InfoVisita() {
   object NadieParaVisitar: InfoVisita()
   class Info(val list: List<Jugador>): InfoVisita()
 
-  class Jugador(val jugador: JugadorModelo, val validaciones: List<ValidacionVisita>)
+  class Jugador(val jugador: JugadorModelo, val validador: Validador<ValidacionVisita>)
 }
