@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
   alias(libs.plugins.agp)
   alias(libs.plugins.jetbrains.kotlin.android)
@@ -10,7 +12,7 @@ plugins {
 
 android {
   namespace = "com.example.composetest"
-  compileSdk = 34
+  compileSdk = 37
 
   defaultConfig {
     applicationId = "com.example.composetest"
@@ -37,8 +39,10 @@ android {
     targetCompatibility = JavaVersion.VERSION_21
   }
 
-  kotlinOptions {
-    jvmTarget = "21"
+  kotlin {
+      compilerOptions {
+          jvmTarget = JvmTarget.JVM_21
+      }
   }
 
   buildFeatures {
