@@ -1,11 +1,11 @@
 plugins {
-  alias(libs.plugins.android.application)
+  alias(libs.plugins.agp)
   alias(libs.plugins.jetbrains.kotlin.android)
   alias(libs.plugins.compose.compiler)
-  id("kotlin-kapt")
+  id("org.jetbrains.kotlin.kapt")
   id("com.google.dagger.hilt.android")
   alias(libs.plugins.serializable)
-  id("kotlin-parcelize")
+  id("org.jetbrains.kotlin.plugin.parcelize")
 }
 
 android {
@@ -33,12 +33,12 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_19
-    targetCompatibility = JavaVersion.VERSION_19
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
   }
 
   kotlinOptions {
-    jvmTarget = "19"
+    jvmTarget = "21"
   }
 
   buildFeatures {
@@ -79,7 +79,6 @@ dependencies {
   testImplementation(libs.mockk)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
-  androidTestImplementation(platform(libs.androidx.compose.bom))
   androidTestImplementation(libs.androidx.ui.test.junit4)
   debugImplementation(libs.androidx.ui.tooling)
   debugImplementation(libs.androidx.ui.test.manifest)
