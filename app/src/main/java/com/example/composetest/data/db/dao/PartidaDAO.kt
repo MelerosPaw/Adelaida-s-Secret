@@ -266,7 +266,7 @@ interface PartidaDAO {
             )
     }
 
-    abstract class BorrarPartidaException(val mensaje: String, causa: Exception?): Exception(causa)
+    abstract class BorrarPartidaException(mensaje: String, causa: Exception?): BaseDatosException(mensaje, causa)
 
     class JugadoresNoBorrados(cantidadBorrados: Int?, causa: Exception?)
         : BorrarPartidaException(cantidadBorrados
