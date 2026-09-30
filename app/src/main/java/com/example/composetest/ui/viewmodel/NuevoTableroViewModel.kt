@@ -22,19 +22,11 @@ import javax.inject.Inject
 @HiltViewModel
 class NuevoTableroViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
+    private val crearTableroUC: CrearTableroUC,
+    private val guardarTableroUC: GuardarTableroUC,
+    private val cargarTableroUC: CargarTableroUC,
+    private val actualizarEstadoCreacion: ActualizarEstadoCreacion
 ) : BaseViewModel() {
-
-    @Inject
-    lateinit var crearTableroUC: CrearTableroUC
-
-    @Inject
-    lateinit var guardarTableroUC: GuardarTableroUC
-
-    @Inject
-    lateinit var cargarTableroUC: CargarTableroUC
-
-    @Inject
-    lateinit var actualizarEstadoCreacion: ActualizarEstadoCreacion
 
     private val _puedeComenzar: MutableState<Boolean> = mutableStateOf(false)
     val puedeComenzar: State<Boolean> = _puedeComenzar

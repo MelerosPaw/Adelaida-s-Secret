@@ -16,10 +16,9 @@ private const val CANCELAR = "Cancelar"
 private const val TABLERO = "Devolver al tablero"
 
 @HiltViewModel
-class DialogAsignarElementoViewModel @Inject constructor() : BaseViewModel() {
-
-    @Inject
-    lateinit var asignarElementoUC: Provider<AsignarElementoUC>
+class DialogAsignarElementoViewModel @Inject constructor(
+    private val asignarElementoUC: Provider<AsignarElementoUC>
+) : BaseViewModel() {
 
     fun getOpcionesParaAsignar(
         jugadores: List<Jugador>,

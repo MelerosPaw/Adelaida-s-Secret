@@ -10,10 +10,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class SospechososViewModel @Inject constructor(): BaseViewModel() {
-
-    @Inject
-    lateinit var obtenerSospechososUC: ObtenerSospechososUC
+class SospechososViewModel @Inject constructor(
+    private val obtenerSospechososUC: ObtenerSospechososUC
+): BaseViewModel() {
 
     private val _sospechosos: MutableState<List<Sospechoso>> = mutableStateOf(emptyList())
     val sospechosos: State<List<Sospechoso>> = _sospechosos

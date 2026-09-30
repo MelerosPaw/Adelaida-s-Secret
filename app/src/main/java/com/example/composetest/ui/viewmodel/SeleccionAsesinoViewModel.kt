@@ -15,11 +15,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SeleccionAsesinoViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val asignarAsesino: AsignarAsesinoUC
 ): BaseViewModel() {
-
-    @Inject
-    lateinit var asignarAsesino: AsignarAsesinoUC
 
     private val _mostrarConfirmacionSospechoso: MutableState<Sospechoso?> = mutableStateOf(null)
     val mostrarConfirmacionSospechoso: State<Sospechoso?> = _mostrarConfirmacionSospechoso

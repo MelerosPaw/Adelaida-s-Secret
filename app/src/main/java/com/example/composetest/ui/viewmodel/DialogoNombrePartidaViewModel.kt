@@ -9,10 +9,9 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 @HiltViewModel
-class DialogoNombrePartidaViewModel @Inject constructor() : BaseViewModel() {
-
-    @Inject
-    lateinit var partidaRepetidaUC: Provider<PartidaRepetidaUC>
+class DialogoNombrePartidaViewModel @Inject constructor(
+    private val partidaRepetidaUC: Provider<PartidaRepetidaUC>
+) : BaseViewModel() {
 
     private val _textoEnCampo: MutableState<String> = mutableStateOf("")
     val textoEnCampo: State<String> = _textoEnCampo

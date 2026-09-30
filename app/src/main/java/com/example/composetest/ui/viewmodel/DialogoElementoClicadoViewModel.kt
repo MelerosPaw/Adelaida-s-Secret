@@ -13,10 +13,9 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 @HiltViewModel
-class DialogoElementoClicadoViewModel @Inject constructor(): BaseViewModel() {
-
-    @Inject
-    lateinit var leerPistaUC: Provider<LeerPistaUC>
+class DialogoElementoClicadoViewModel @Inject constructor(
+    private val leerPistaUC: Provider<LeerPistaUC>
+): BaseViewModel() {
 
     private val _dialogoSeleccionJugadores: MutableState<Boolean> = mutableStateOf(false)
     var dialogoSeleccionJugadores: State<Boolean> = _dialogoSeleccionJugadores

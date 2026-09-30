@@ -35,15 +35,11 @@ typealias PartidaNavegacion = com.example.composetest.ui.compose.navegacion.Part
 
 @HiltViewModel
 class PartidaViewModel @Inject constructor(
-    val savedStateHandle: SavedStateHandle
+    val savedStateHandle: SavedStateHandle,
+    private val actualizarNombrePartidaUC: Provider<ActualizarNombrePartidaUC>,
+    private val obtenerPartidaFlowUC: Provider<ObtenerPartidaFlowUC>,
+    private val actualizarRondaUC: Provider<PasarSiguienteRondaUC>
 ) : BaseViewModel() {
-
-    @Inject
-    lateinit var actualizarNombrePartidaUC: Provider<ActualizarNombrePartidaUC>
-    @Inject
-    lateinit var obtenerPartidaFlowUC: Provider<ObtenerPartidaFlowUC>
-    @Inject
-    lateinit var actualizarRondaUC: Provider<PasarSiguienteRondaUC>
 
     // region Estados
     var estado: EstadoPartida = EstadoPartida()

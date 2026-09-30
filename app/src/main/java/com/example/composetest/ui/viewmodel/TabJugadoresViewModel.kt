@@ -34,18 +34,13 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 @HiltViewModel
-class TabJugadoresViewModel @Inject constructor() : BaseViewModel() {
-
-    @Inject
-    lateinit var gastarCartaUC: Provider<GastarCartaUC>
-    @Inject
-    lateinit var comprarUC: Provider<ComprarUC>
-    @Inject
-    lateinit var robarUC: Provider<RobarUC>
-    @Inject
-    lateinit var reemplazarPistaDeVitrinaUC: Provider<ReemplazarPistaDeVitrinaUC>
-    @Inject
-    lateinit var asignarElementoUC: Provider<AsignarElementoUC>
+class TabJugadoresViewModel @Inject constructor(
+    private val gastarCartaUC: Provider<GastarCartaUC>,
+    private val comprarUC: Provider<ComprarUC>,
+    private val robarUC: Provider<RobarUC>,
+    private val reemplazarPistaDeVitrinaUC: Provider<ReemplazarPistaDeVitrinaUC>,
+    private val asignarElementoUC: Provider<AsignarElementoUC>
+) : BaseViewModel() {
 
     // region Estados
     private val _opcionesClicado: MutableState<OpcionesClicado> = mutableStateOf(OpcionesClicado.OpcionesCasilla())

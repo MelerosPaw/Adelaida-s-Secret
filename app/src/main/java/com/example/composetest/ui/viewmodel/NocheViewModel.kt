@@ -34,16 +34,13 @@ import javax.inject.Provider
 import kotlin.random.Random
 
 @HiltViewModel
-class NocheViewModel @Inject constructor(val savedStateHandle: SavedStateHandle) : BaseViewModel() {
-
-  @Inject
-  lateinit var asignarBaremoUC: Provider<AsignarBaremoAJugadorUC>
-  @Inject
-  lateinit var obtenerEventosUC: Provider<ObtenerEventosUC>
-  @Inject
-  lateinit var seleccionarEventoUC: Provider<SeleccionarEventoUC>
-  @Inject
-  lateinit var ejecutarEventoUC: Provider<EjecutarEventoUC>
+class NocheViewModel @Inject constructor(
+    val savedStateHandle: SavedStateHandle,
+    private val asignarBaremoUC: Provider<AsignarBaremoAJugadorUC>,
+    private val obtenerEventosUC: Provider<ObtenerEventosUC>,
+    private val seleccionarEventoUC: Provider<SeleccionarEventoUC>,
+    private val ejecutarEventoUC: Provider<EjecutarEventoUC>
+) : BaseViewModel() {
 
   private var partida: Partida? = null
   private var gestorRonda: GestorRonda? = null

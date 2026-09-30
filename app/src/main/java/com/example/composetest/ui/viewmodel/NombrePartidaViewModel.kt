@@ -12,10 +12,9 @@ const val JUEGO_NUEVO = "Juego nuevo"
 const val DEBUG_MODE = "Debug mode"
 
 @HiltViewModel
-class NombrePartidaViewModel @Inject constructor() : BaseViewModel() {
-
-    @Inject
-    lateinit var crearPartidaUC: CrearPartidaUC
+class NombrePartidaViewModel @Inject constructor(
+    private val crearPartidaUC: CrearPartidaUC
+) : BaseViewModel() {
 
     private val _nombreEnElTitulo: MutableState<String> = mutableStateOf("<Sin nombre>")
     val nombreEnElTitulo: State<String> = _nombreEnElTitulo

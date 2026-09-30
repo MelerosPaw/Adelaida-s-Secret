@@ -16,11 +16,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SeleccionJugadoresViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val asignarJugadoresYNombreUC: AsignarJugadoresYNombrePartida
 ) : BaseViewModel() {
-
-    @Inject
-    lateinit var asignarJugadoresYNombreUC: AsignarJugadoresYNombrePartida
 
     private val _listadoJugadores: MutableState<List<String>> = mutableStateOf(emptyList())
     val listadoJugadores: State<List<String>> = _listadoJugadores

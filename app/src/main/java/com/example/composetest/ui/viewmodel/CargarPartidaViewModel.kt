@@ -15,12 +15,10 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
-class CargarPartidaViewModel @Inject constructor() : BaseViewModel() {
-
-    @Inject
-    lateinit var obtenerPartidasUC: ObtenerPartidasUC
-    @Inject
-    lateinit var borrarPartidaCompletaUC: BorrarPartidaCompletaUC
+class CargarPartidaViewModel @Inject constructor(
+    private val obtenerPartidasUC: ObtenerPartidasUC,
+    private val borrarPartidaCompletaUC: BorrarPartidaCompletaUC
+) : BaseViewModel() {
 
     private val _listadoPartidas: MutableState<Flow<List<Partida>?>?> = mutableStateOf(null)
     val listadoPartidas: State<Flow<List<Partida>?>?> = _listadoPartidas
